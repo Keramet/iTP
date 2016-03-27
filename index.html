@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf8">
+	<title>iTP - Insart Table Procesor</title>
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+		
+</head>
+	
+<body>
+	<header>
+		<fieldset>
+			<legend>Таблица</legend>
+		
+			<label>Количество строк:
+				<input type="number" id="rCount"  min="1" required autofocus>
+			</label><br>
+			<hr>
+			<label>Количество столбцов:
+				<input type="number" id=cCount min="1" required>
+			</label><br>
+			<label> <i>Заголовки столбцов:</i>
+				<select name="colType">
+					<option value="alph">[A-Z]</option>
+					<option value="numb">[1, 2, ...]</option>
+				</select>
+			</label>
+			<br>
+			<button id="btnCreate">Создать</button>
+		</fieldset>
+	</header>
+		
+	<main>
+		<div>
+			<div class="empty">empty</div>
+			<div class="colHeader">
+				<table id='itpTableCol'>
+
+				</table>
+			</div>
+		</div>
+		<div>
+			<div class="rowHeader">
+				<table id='itpTableRow'>
+
+				</table>
+			</div>
+			<div class="table">
+				<table id='itpTable'>
+
+				</table>
+			</div>
+		</div>
+	</main>
+		
+		
+		
+	<footer>	
+	</footer>
+
+	<script src="js/main.js"></script>
+</body>
+</html>
+

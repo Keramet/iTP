@@ -1,0 +1,103 @@
+* {
+	padding: 5px;
+	margin: 5px;
+}
+
+div.table {
+	border: 1px solid blue;
+	overflow: scroll;
+
+}
+div {
+	border: 1px solid blue;
+	padding: 0px;
+	margin: 0px;
+}
+label {
+	width: 100px;
+	cursor: pointer;
+}
+hr {
+	padding:0;
+}
+
+table {
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 13px;
+	border-collapse: collapse;
+	text-align: right;
+	position:relative;
+}
+
+td {
+	border-style: solid;
+	border-width: 0 1px 1px 0;
+	border-color: white;
+	width: 100px;
+	height: 10px;
+	background: #D8E6F3;
+}
+
+tr:first-child>td, td:first-child {
+	background: #AFCDE7;
+	text-align: center;
+	color: white;
+	padding: 5px 20px;
+	font-weight: bold;
+	width: 100px;
+}
+
+.empty, .colHeader  {
+	height: 42px;
+	
+}
+.colHeader {
+	overflow: hidden;
+	overflow-y: scroll ;
+}
+
+.empty, .rowHeader {
+	float: left;
+	width: 70px;
+}
+.colHeader, .table {
+
+	margin-left: 80px;
+	width: auto;
+}
+.rowHeader, .table {
+	height: 60%;
+}
+fieldset {
+	display: inline-block;
+}
+
+input[type=number] {
+	width: 60px;
+};
+
+/*
+.empty, .colHeader  {
+	display: inline-block;
+	height: 30px;
+}	
+
+.empty, .rowHeader{
+	width: 4%;
+}
+.colHeader, .table {
+	width: 80%;
+}
+*/
+
+
+
+/*
+empty">empty</div>
+			<div class="colHeader">colHeader</div>	
+			<div class="rowHeader">rowHeader</div>
+			<div class="table">
+
+*/
+
+
