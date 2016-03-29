@@ -36,8 +36,26 @@ var itp = itp || {};
 			table.height = itp.rCount * itp._config.cell.height + "px";
 
 			table.addEventListener("click", function (e) {
-				e.target.innerHTML = "+";
-				console.log(e.target);
+				var input; 
+
+				if (e.target.nodeName === "TD") {
+					input = document.createElement("input");
+					input.className = "inGrid";
+					input.value = e.target.innerHTML;
+					input.onblur = function () {
+						this.parentNode.innerHTML = this.value;
+					//	this.parentNode.removeChild(this);
+					};
+					e.target.style.padding = 0;
+					e.target.innerHTML = "";
+					e.target.appendChild(input);
+					input.focus();
+
+				//	console.log(e.target);
+				//	console.log(document.querySelector('td'));
+				//	console.log(e.target.nodeName);
+				}
+				
 			});
 
 

@@ -61,11 +61,21 @@ td {
 	width: 100px;
 	height: 21px;
 	background: #D8E6F3;
+	overflow: hidden;
 }
 td:hover {
 /*	border-color: yellow; 
 	border: 1px solid yellow;*/
 	background: #B1F6D0;
+	cursor: text;
+}
+input.inGrid {
+	background: white;
+	border: 1px solid navy;
+	margin: 0;
+	height: 19px;
+	width: 98px;
+
 }
 
 .empty {
