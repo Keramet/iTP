@@ -5,7 +5,7 @@ var itp = itp || {};
 	itp._config = {
 		rCount: 10,
 		cCount: 20,
-		cell: { width: 100, height: 30 }	// px;
+		cell: { width: 100, height: 20 }	// px;
 	}
 
 	itp.init = function () {
@@ -34,6 +34,14 @@ var itp = itp || {};
 
 			table.width  = itp.cCount * itp._config.cell.width + "px";
 			table.height = itp.rCount * itp._config.cell.height + "px";
+
+			table.addEventListener("click", function (e) {
+				e.target.innerHTML = "+";
+				console.log(e.target);
+			});
+
+
+
 
 
 			for (r = 0; r < itp.rCount; r++) {
@@ -64,7 +72,8 @@ var itp = itp || {};
   //				console.log( "X: " + scrolledX + 'px' );
 			}
 			console.dir(table);
-
+			console.dir(document.querySelector('td').height);
+			console.dir(document.querySelector('th').height);	
 	//	document.querySelector('.rowHeader').offsetHeight = document.querySelector('.table').offsetHeight;
 	//	console.log(document.querySelector('.table').style.height);
 	//	console.log(document.querySelector('.rowHeader').style);
