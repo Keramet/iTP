@@ -29,7 +29,7 @@ var itp = itp || {};
 		//	tbody = table.getElementsByTagName('tbody'),
 			r, c, row;
 
-		if (itp._isCreat) { alert("Таблица уже создана!"); }
+		if (itp._isCreate) { alert("Таблица уже создана!"); }
 		else {
 			console.log( table.width  = itp.cCount * itp._config.cell.width + "px" );
 			console.log( table.height = itp.rCount * itp._config.cell.height + "px" );
@@ -46,10 +46,13 @@ var itp = itp || {};
 					input.value = e.target.innerHTML;
 
 					input.onblur = function () {
-				//		this.parentNode.classList.remove("input");
-						this.parentNode.class = "";
+						this.parentNode.class = ""; 	//	можно так:	this.parentNode.classList.remove("input");
 						this.parentNode.innerHTML = this.value;
 					};
+
+					input.onkeyup  = function (e) { 
+						if (e.keyCode === 13) this.blur();; 
+					}
 
 					e.target.innerHTML = "";
 					e.target.appendChild(input);
@@ -71,41 +74,13 @@ var itp = itp || {};
 				}
 			}
 
-			itp._isCreat = true;	// 
-
-			document.querySelector('main').style.display = "block";
-
-			var divTab = document.querySelector('.table');
-			divTab.onscroll = function() {
-				console.log("table.onscroll");
-  				var scrolledY = divTab.pageYOffset || divTab.scrollTop,
-  					scrolledX = divTab.pageXOffset || divTab.scrollLeft;
-  	
-  				if (scrolledY) { tableRow.style.top = -scrolledY + "px"; }
-
-  				if (scrolledX) {
-  					tableCol.style.left = -scrolledX + "px";
-  					console.log( "X: " + scrolledX + 'px' );
-  					console.log( tableCol.style.left);
-  				}
-  			//	console.log(divTab.pageYOffset);
-  			//	console.log(document.documentElement.scrollTop);
-			//	console.log(divTab.scrollTop);
-
-  			//	console.log( "X: " + scrolledX + 'px' );
+			document.querySelector('.table').onscroll = function() {
+				tableRow.style.top  = -this.scrollTop  + "px";
+				tableCol.style.left = -this.scrollLeft + "px";
 			}
-		//	console.dir(table);
-		
-			console.log(tableCol.width);
-			console.log(tableCol.style.width);
-			console.log(document.querySelector('.colHeader').style.width);
-			console.log(document.querySelector('.colHeader').width);
-			console.log(table.width);
-		//	console.dir(document.querySelector('th').height);	
-	//	document.querySelector('.rowHeader').offsetHeight = document.querySelector('.table').offsetHeight;
-	//	console.log(document.querySelector('.table').style.height);
-	//	console.log(document.querySelector('.rowHeader').style);
-	//	console.log(table.offsetHeight);
+
+			itp._isCreate = true;	// отслеживает, была ли создана таблица
+			document.querySelector('main').style.display = "block";
 
 		}
 	}

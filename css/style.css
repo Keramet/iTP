@@ -85,7 +85,6 @@ input.inGrid {
 	margin: 0px;
 	height: 19px;
 	width: 85px;
-
 }
 
 .empty {
@@ -146,12 +145,5 @@ input[type=number] {
 
 
 
-/*
-empty">empty</div>
-			<div class="colHeader">colHeader</div>	
-			<div class="rowHeader">rowHeader</div>
-			<div class="table">
-
-*/
 
 
