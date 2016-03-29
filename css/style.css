@@ -30,6 +30,10 @@ hr {
 	padding: 0px;
 	margin: 0px;
 }
+.table table {
+	color: navy;
+}
+
 
 .colHeader table {
 	width: 2000px;
@@ -43,7 +47,7 @@ main {
 
 th {
 	background: #AFCDE7;
-	border: 1px solid blue;
+	border: 0px solid blue;
 	text-align: center;
 	font-weight: bold;
 	font-size: 14px;
@@ -51,16 +55,21 @@ th {
 	text-shadow: 1px 1px 2px blue, 0 0 1em white;
 	padding: 5px 20px;
 	width: 100px;
-	height: 20px; 
+	height: 18px; 
 }
 td {
 /*	border: 1px solid white;
 	border-style: solid;
 	border-width: 1px 1px 1px 1px;
 	border-color: white;	*/
-	width: 100px;
+	width: 87px; 
 	height: 21px;
 	background: #D8E6F3;
+	overflow: hidden;
+}
+td.input {
+	padding: 0px;
+	margin: 0px;
 	overflow: hidden;
 }
 td:hover {
@@ -68,13 +77,14 @@ td:hover {
 	border: 1px solid yellow;*/
 	background: #B1F6D0;
 	cursor: text;
+	overflow: hidden;
 }
 input.inGrid {
 	background: white;
 	border: 1px solid navy;
-	margin: 0;
+	margin: 0px;
 	height: 19px;
-	width: 98px;
+	width: 85px;
 
 }
 
@@ -84,7 +94,7 @@ input.inGrid {
 }
 
 .empty, .colHeader  {
-	height: 37px;
+	height: 35px;
 	border-bottom: none;
 }
 .colHeader {
