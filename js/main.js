@@ -58,13 +58,13 @@ var itp = itp || {};
 		var table = document.querySelector('#itpTable'),
 			tableCol = document.querySelector('#itpTableCol'),
 			tableRow = document.querySelector('#itpTableRow'),
-		//	tbody = table.getElementsByTagName('tbody'),
+			tbody = table.getElementsByTagName('tbody')[0],
 			r, c, row;
 
 		if (itp._isCreate) { alert("Таблица уже создана!"); }
 		else {
-			console.log( table.width  = itp.cCount * itp._config.cell.width + "px" );
-			console.log( table.height = itp.rCount * itp._config.cell.height + "px" );
+			table.width  = itp.cCount * itp._config.cell.width + "px";
+			table.height = itp.rCount * itp._config.cell.height + "px";
 			tableCol.width = table.width;
 			tableRow.height = table.height;
 
@@ -78,7 +78,7 @@ var itp = itp || {};
 					input.value = e.target.innerHTML;
 
 					input.onblur = function () {
-						this.parentNode.class = ""; 	//	можно так:	this.parentNode.classList.remove("input");
+						this.parentNode.classList.remove("input");	//	можно так:	this.parentNode.class = "";
 						this.parentNode.innerHTML = this.value;
 					};
 
@@ -93,7 +93,7 @@ var itp = itp || {};
 			});
 
 			for (r = 0; r < itp.rCount; r++) {
-				table.insertRow(r);
+				tbody.insertRow(r);
 				tableRow.insertRow(r).insertCell(0).outerHTML = "<th>" + (r + 1) + "</th>";
 
 				for (c = 0; c < itp.cCount; c++) {
@@ -102,7 +102,7 @@ var itp = itp || {};
 						tableCol.rows[0].insertCell(c).outerHTML = "<th>" + String.fromCharCode(65 + c) + "</th>";
 						//tableCol.rows[0].insertCell(c).textContent = String.fromCharCode(65 + c);
 					 }
-					table.rows[r].insertCell(c);
+					tbody.rows[r].insertCell(c);
 				}
 			}
 

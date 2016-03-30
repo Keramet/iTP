@@ -2,86 +2,105 @@
 	padding: 5px;
 	margin: 0px;
 }
-
-div.table {
-	border: 1px solid blue;
-	overflow: scroll;
-
-}
 div {
 	border: 1px solid blue;
 	padding: 0px;
 }
-label {
-	width: 150px;
-	cursor: pointer;
+
+main {
+	display: none;
+	border: 2px solid #0C7E50;
+	border-radius: 4px;
+	padding: 0px;
 }
-hr {
-	padding:0;
+	main>div {
+		background: #AAD4B9; 
+		border: none;
+	}	
+	main>div:first-child {
+		border-bottom: none;
+		padding: 0 10px 0 10px;
+	}			
+	main>div:last-child {
+		border-top: none;
+		padding: 0 10px 10px 10px;
+	}
+
+.sheetsTab {
+	background: #AAD4B9; /* #B1B1B9; */
+	border: none;
+	text-align: right;
+	padding: 15px 5px 0 5px;
+}
+	.sheetsTab a {
+		vertical-align: text-bottom;
+	}
+	.sheetsTab a span {
+		display: inline-block;
+		border-radius: 10px 10px 0 0;
+		width: 100px;
+		margin-right: 5px;
+		text-align: center;
+		color: #6E718C;
+		background: #ddd;
+		padding: 5px;
+	}
+	.sheetsTab a span.active {
+		background: #7DB9CF;
+		border: 1px solid blue;
+		border-bottom: none;
+		font-weight: bold;
+		color: white;
+	}
+
+
+div.empty {
+	background: #AFCDE7;
+	text-align: center;
+}
+div.colHeader {
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+div.rowHeader {
+	overflow-x: scroll;
+	overflow-y: hidden;
+}
+div.table {
+	overflow: scroll;
 }
 
-.table table, .colHeader table, .rowHeader table {
+
+div.empty, div.colHeader {
+	height: 35px;
+	border-bottom: none;
+}
+div.empty, div.rowHeader {
+	float: left;
+	width: 70px;
+	border-right: none;
+}
+div.colHeader, div.table {
+	margin-left: 70px;
+	width: auto;	
+}
+div.rowHeader, div.table {
+	height: 360px;
+}
+
+
+/* .table table, .colHeader table, .rowHeader table {	*/
+main table {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 13px;
 	border-collapse: separate;
 	text-align: right;
-	position:relative;
+	position: relative;
 	padding: 0px;
-	margin: 0px;
 	background: white;
 }
-.table table {
+div.table table {
 	color: navy;
-}
-main>div {
-	background: #B1B1B9;
-}
-main>div:first-child {
-	border-bottom: none;
-	padding: 0 10px 0 10px;
-}
-main>div:last-child {
-	border-top: none;
-	padding: 0 10px 10px 10px;
-}
-
-.sheetsTab {
-	background: #B1B1B9;
-	border: none;
-	text-align: right;
-	padding: 15px 5px 0 5px;
-	
-}
-.sheetsTab a {
-	vertical-align: text-bottom;
-}
-
-.sheetsTab a span {
-	display: inline-block;
-	border-radius: 10px 10px 0 0;
-	width: 100px;
-	margin-right: 5px;
-	text-align: center;
-	color: silver;
-	background: #ddd;
-	padding: 5px;
-}
-.sheetsTab a span.active {
-	background: #7DB9CF;
-	border: 1px solid blue;
-	border-bottom: none;
-	font-weight: bold;
-	color: white;
-}
-
-.colHeader table {
-	width: 2000px;
-}
-
-main {
-	display: none;
-	padding: 0px;
-	margin: 0px;
 }
 
 th {
@@ -92,32 +111,28 @@ th {
 	font-size: 14px;
 	color: white;
 	text-shadow: 1px 1px 2px blue, 0 0 1em white;
-	padding: 5px 20px;
-	width: 100px;
-	height: 18px; 
+	padding: 5px;
+	width: 70px;
+/*	height: 18px;  */
 }
 td {
-/*	border: 1px solid white;
-	border-style: solid;
-	border-width: 1px 1px 1px 1px;
-	border-color: white;	*/
-	width: 87px; 
+	width: 87px; 	
 	height: 21px;
 	background: #D8E6F3;
 	overflow: hidden;
+	padding: 5px;
 }
-td.input {
-	padding: 0px;
-	margin: 0px;
-	overflow: hidden;
-}
-td:hover {
-/*	border-color: yellow; 
-	border: 1px solid yellow;*/
-	background: #B1F6D0;
-	cursor: text;
-	overflow: hidden;
-}
+	td:hover {
+		background: #B1F6D0;
+		cursor: text;
+		overflow: hidden;
+	}	
+	td.input {
+		padding: 0px;
+		margin: 0px;
+		overflow: hidden;
+	}
+
 input.inGrid {
 	background: white;
 	border: 1px solid navy;
@@ -126,64 +141,15 @@ input.inGrid {
 	width: 85px;
 }
 
-.empty {
-	background: #AFCDE7;
-	text-align: center;
-}
-
-.empty, .colHeader  {
-	height: 35px;
-	border-bottom: none;
-}
-.colHeader {
-	overflow: hidden;
-	overflow-y: scroll ;
-}
-.rowHeader {
-	overflow: hidden;
-	overflow-x: scroll ;
-}
-
-.empty, .rowHeader {
-	float: left;
-	width: 70px;
-}
-.colHeader, .table {
-	margin-left: 70px;
-	width: auto;	
-}
-.rowHeader, .table {
-	height: 400px;
-}
-.table{
-	overflow:auto;
-}
 fieldset {
 	display: inline-block;
 }
-
 input[type=number] {
 	width: 60px;
 };
-
-
-
-
-/*
-.empty, .colHeader  {
-	display: inline-block;
-	height: 30px;
-}	
-
-.empty, .rowHeader{
-	width: 4%;
+label {
+	width: 150px;
+	cursor: pointer;
 }
-.colHeader, .table {
-	width: 80%;
-}
-*/
-
-
-
 
 
