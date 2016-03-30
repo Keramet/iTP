@@ -15,7 +15,6 @@
 			<label>Количество строк:
 				<input type="number" id="rCount"  min="1" required autofocus>
 			</label><br>
-			<hr>
 			<label>Количество столбцов:
 				<input type="number" id=cCount min="1" required>
 			</label><br>
@@ -25,13 +24,17 @@
 					<option value="numb">[1, 2, ...]</option>
 				</select>
 			</label>
-			<br>
 			<button id="btnCreate">Создать</button>
 		</fieldset>
 	</header>
 		
 	<main>
 		<div>
+			<div class="sheetsTab">
+				<a href=""><span class="active">Лист 1</span></a>
+				<a href=""><span>Лист 2</span></a>
+				<a href=""><span>Лист 3</span></a>
+			</div>
 			<div class="empty"></div>
 			<div class="colHeader">
 				<table id='itpTableCol'>

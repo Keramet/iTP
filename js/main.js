@@ -19,6 +19,23 @@ var itp = itp || {};
 			itp.rCount = rCountInput.value;
 			itp.cCount = cCountInput.value;
 			itp._createTables();
+			itp._tabsClick();
+		});
+	}
+
+	itp._tabsClick = function () {
+		var allTabs = [].slice.call(document.querySelectorAll(".sheetsTab a span"));
+	//	var allTabs = document.querySelectorAll(".sheetsTab a span");
+
+		allTabs.forEach(function(tab) {
+			tab.onclick	= function (e) {
+				var tabs = document.querySelectorAll(".sheetsTab a span");
+				[].slice.call(tabs).forEach(function(item) {
+				 	item.classList.remove("active"); 
+				});
+				e.target.classList.add("active");
+				return false;
+			}
 		});
 	}
 		
@@ -50,8 +67,8 @@ var itp = itp || {};
 						this.parentNode.innerHTML = this.value;
 					};
 
-					input.onkeyup  = function (e) { 
-						if (e.keyCode === 13) this.blur();; 
+					input.onkeyup = function (e) {
+						if (e.keyCode === 13) this.blur();
 					}
 
 					e.target.innerHTML = "";

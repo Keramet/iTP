@@ -1,6 +1,6 @@
 * {
 	padding: 5px;
-	margin: 5px;
+	margin: 0px;
 }
 
 div.table {
@@ -11,7 +11,6 @@ div.table {
 div {
 	border: 1px solid blue;
 	padding: 0px;
-	margin: 0px;
 }
 label {
 	width: 150px;
@@ -29,11 +28,50 @@ hr {
 	position:relative;
 	padding: 0px;
 	margin: 0px;
+	background: white;
 }
 .table table {
 	color: navy;
 }
+main>div {
+	padding: 0 5px 0 5px;
+	background: #B1B1B9;
+}
+main>div:first-child {
+	border-bottom: none;
+}
+main>div:last-child {
+	border-top: none;
+}
 
+.sheetsTab {
+	background: #B1B1B9;
+	border: none;
+	text-align: right;
+	padding: 15px 5px 0 5px;
+	
+}
+.sheetsTab a {
+	vertical-align: text-bottom;
+}
+
+.sheetsTab a span {
+	display: inline-block;
+	border-radius: 10px 10px 0 0;
+	width: 100px;
+	margin-right: 5px;
+	text-align: center;
+	color: silver;
+	background: #ddd;
+	padding: 5px;
+}
+.sheetsTab a span.active {
+	background: #7DB9CF;
+	border: 1px solid blue;
+	border-bottom: none;
+	font-weight: bold;
+	color: white;
+}
 
 .colHeader table {
 	width: 2000px;
@@ -126,6 +164,7 @@ fieldset {
 input[type=number] {
 	width: 60px;
 };
+
 
 
 
