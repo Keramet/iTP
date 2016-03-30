@@ -34,14 +34,15 @@ hr {
 	color: navy;
 }
 main>div {
-	padding: 0 5px 0 5px;
 	background: #B1B1B9;
 }
 main>div:first-child {
 	border-bottom: none;
+	padding: 0 10px 0 10px;
 }
 main>div:last-child {
 	border-top: none;
+	padding: 0 10px 10px 10px;
 }
 
 .sheetsTab {
@@ -152,7 +153,7 @@ input.inGrid {
 	width: auto;	
 }
 .rowHeader, .table {
-	height: 300px;
+	height: 400px;
 }
 .table{
 	overflow:auto;

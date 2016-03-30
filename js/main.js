@@ -3,9 +3,10 @@
 var itp = itp || {};
 	
 	itp._config = {
-		rCount: 10,
+		rCount: 20,
 		cCount: 20,
-		cell: { width: 100, height: 30 }	// px;
+		cell: { width: 100, height: 30 },	// px;
+		sheets: [ "Лист 1", "Лист 2", "Лист 3", "Лист 4" ]
 	}
 
 	itp.init = function () {
@@ -19,11 +20,25 @@ var itp = itp || {};
 			itp.rCount = rCountInput.value;
 			itp.cCount = cCountInput.value;
 			itp._createTables();
-			itp._tabsClick();
+			itp._createTabs();
+			itp._clickTabs();
 		});
 	}
 
-	itp._tabsClick = function () {
+	itp._createTabs = function () {
+		var tab,
+			sheetsTab = document.querySelector("div.sheetsTab");
+
+		itp._config.sheets.forEach( function (el, i) {
+			tab = document.createElement("a");
+			tab.href = "#";
+			tab.innerHTML = "<span" + ( (!i) ? " class='active'" : "" ) + ">" + el + "</span>";
+			sheetsTab.appendChild(tab);
+			console.log(tab);
+		});
+	}
+
+	itp._clickTabs = function () {
 		var allTabs = [].slice.call(document.querySelectorAll(".sheetsTab a span"));
 	//	var allTabs = document.querySelectorAll(".sheetsTab a span");
 
