@@ -20,7 +20,7 @@ var itp = itp || {};
 			itp.rCount = rCountInput.value;
 			itp.cCount = cCountInput.value;
 			itp._createTabs();
-			itp._clickTabs();
+		//	itp._clickTabs();
 			itp._createTables();
 		});
 	}
@@ -29,6 +29,7 @@ var itp = itp || {};
 		var tab,
 			sheetsTab = document.querySelector("div.sheetsTab");
 
+		if (itp._isCreate) return "_isCreate";
 		itp._config.sheets.forEach( function (el, i) {
 			tab = document.createElement("a");
 			tab.href = "#";
@@ -36,12 +37,14 @@ var itp = itp || {};
 			sheetsTab.appendChild(tab);
 		//	console.log(tab);
 		});
+		itp._clickTabs();
 	}
 
 	itp._clickTabs = function () {
 		var allTabs = [].slice.call(document.querySelectorAll(".sheetsTab a span"));
 	//	var allTabs = document.querySelectorAll(".sheetsTab a span");
 
+	//	if (itp._isCreate) return "_isCreate";
 		allTabs.forEach(function(tab) {
 			tab.onclick	= function (e) {
 				var tabs = document.querySelectorAll(".sheetsTab a span");
@@ -162,7 +165,7 @@ var itp = itp || {};
 
 		function getChar(i) { return String.fromCharCode(startChar.charCodeAt(0) + i) }
 
-		(function decomposition(N, base) {
+		(function decomposition(N, base) {		// подумать, может base убрать?? (использовать сразу chCount)
 			var temp = Math.floor(N / base);
 
 			if (!temp) { arr.unshift( getChar(N) ); }
