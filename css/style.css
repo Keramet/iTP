@@ -125,16 +125,28 @@ td {
 	overflow: hidden;
 	padding: 5px;
 }
-	td:hover {
-		background: #B1F6D0;
+	td:hover, td.selected  {
 		cursor: text;
 		overflow: hidden;
+	}	
+	td:hover  {
+		background: #B1F6D0;
+		color: #0B4124;
+	}
+	td.selected {
+		background: #F4CFF7;
+		color: #28082B;
+	}
+	td.selected:hover {
+		background: #F2F6C1;
+		color: #30330A;
 	}	
 	td.input {
 		padding: 0px;
 		margin: 0px;
 		overflow: hidden;
 	}
+
 
 input.inGrid {
 	background: white;

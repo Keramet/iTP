@@ -86,7 +86,8 @@ var itp = itp || {};
 			}
 
 			itp.table.addEventListener("click", itp._clickGrid);
-
+			itp.table.addEventListener("dblclick", itp._dblclickGrid);
+			
 			document.querySelector('.table').onscroll = function() {
 				var needAddC = this.scrollWidth - (this.clientWidth + this.scrollLeft),
 					needAddR = this.scrollHeight - (this.clientHeight + this.scrollTop);
@@ -104,7 +105,7 @@ var itp = itp || {};
 		}
 	}
 
-	itp._clickGrid = function (e) {		// при нажатии на ячейку
+	itp._dblclickGrid = function (e) {		// при нажатии на ячейку
 		var input; 
 
 		if (e.target.nodeName === "TD") {
@@ -126,6 +127,10 @@ var itp = itp || {};
 			e.target.appendChild(input);
 			input.focus();
 		}
+	}
+
+	itp._clickGrid = function (e) { 
+		if (e.target.nodeName === "TD") { e.target.classList.toggle("selected"); }
 	}
 
 	itp._addRow = function (n) {
