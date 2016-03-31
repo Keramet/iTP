@@ -7,14 +7,20 @@ div {
 	padding: 0px;
 }
 
-main {
-	display: none;
-	border: 2px solid #0C7E50;
+main, header {
+	border: 2px solid MidnightBlue;
 	border-radius: 4px;
 	padding: 0px;
 }
+header {
+	padding: 7px;
+	background: #AAD4B9;
+}
+main {
+	display: none;	
+}
 	main>div {
-		background: #AAD4B9; 
+		background: Lavender; /* PowderBlue;   #AAD4B9; */
 		border: none;
 	}	
 	main>div:first-child {
@@ -27,7 +33,7 @@ main {
 	}
 
 .sheetsTab {
-	background: #AAD4B9; /* #B1B1B9; */
+	background: Lavender;	/*	#AAD4B9;  #B1B1B9;    подобрать цвет!    */
 	border: none;
 	text-align: right;
 	padding: 15px 5px 0 5px;
@@ -42,17 +48,16 @@ main {
 		margin-right: 5px;
 		text-align: center;
 		color: #6E718C;
-		background: #ddd;
+		background: Silver;
 		padding: 5px;
 	}
 	.sheetsTab a span.active {
-		background: #7DB9CF;
+		background: #7DB9CF;	
 		border: 1px solid blue;
 		border-bottom: none;
 		font-weight: bold;
 		color: white;
 	}
-
 
 div.empty {
 	background: #AFCDE7;
@@ -70,7 +75,6 @@ div.table {
 	overflow: scroll;
 }
 
-
 div.empty, div.colHeader {
 	height: 35px;
 	border-bottom: none;
@@ -87,7 +91,6 @@ div.colHeader, div.table {
 div.rowHeader, div.table {
 	height: 360px;
 }
-
 
 /* .table table, .colHeader table, .rowHeader table {	*/
 main table {
