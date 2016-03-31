@@ -154,12 +154,26 @@ var itp = itp || {};
 		itp.tableCol.width = itp.table.width;	
 	}
 
-	itp._colName = function (n) {			//	!! Переделать !!
-		var str = String.fromCharCode(65 + n);
+	itp._colName = function (n) {		
+		var startChar = "A",
+			endChar = "Z",
+			chCount = endChar.charCodeAt(0) - startChar.charCodeAt(0) + 1,
+			arr = [];
 
-		return str;
+		function getChar(i) { return String.fromCharCode(startChar.charCodeAt(0) + i) }
+
+		(function decomposition(N, base) {
+			var temp = Math.floor(N / base);
+
+			if (!temp) { arr.unshift( getChar(N) ); }
+			else {
+				arr.unshift( getChar(N % base) );
+				decomposition( temp - 1, base );
+			}
+		})(n, chCount);
+
+		return arr.join("");
 	}
-
 
 
 
