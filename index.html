@@ -17,21 +17,28 @@
 			</label><br>
 			<label>Количество столбцов:
 				<input type="number" id=cCount min="1" required>
-			</label><br>
-			<label> <i>Заголовки столбцов:</i>
+			</label>
+			<br>
+			<!--<label> <i>Заголовки столбцов:</i>
 				<select name="colType">
 					<option value="alph">[A-Z]</option>
 					<option value="numb">[1, 2, ...]</option>
 				</select>
-			</label>
+			</label> -->
 			<button id="btnCreate">Создать</button>
 		</fieldset>
+		<fieldset>
+			<legend>JSON</legend>
+			<button id="btnGetJSON">Получить JSON</button>
+			<div id="outputJSON"></div>	
+		</fieldset>
+
 	</header>
 		
 	<main>
 		<div>
 			<div class="sheetsTab">
-			
+
 			</div>
 			<div class="empty"></div>
 			<div class="colHeader">

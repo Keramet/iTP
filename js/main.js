@@ -23,6 +23,12 @@ var itp = itp || {};
 		//	itp._clickTabs();
 			itp._createTables();
 		});
+
+		document.querySelector('#btnGetJSON').addEventListener("click", function () {
+			itp._getJSONData('http://keramet.kh.ua/json.php', function(data){
+    			document.querySelector('#outputJSON').innerHTML = JSON.stringify(data) + "<br>" + JSON.stringify(itp.JSONdata);
+			});
+		});
 	}
 
 	itp._createTabs = function () {
@@ -48,7 +54,8 @@ var itp = itp || {};
 		allTabs.forEach(function(tab) {
 			tab.onclick	= function (e) {
 				var tabs = document.querySelectorAll(".sheetsTab a span");
-				[].slice.call(tabs).forEach(function(item) {
+
+				[].slice.call(tabs).forEach( function (item) {
 				 	item.classList.remove("active"); 
 				});
 				e.target.classList.add("active");
@@ -87,7 +94,11 @@ var itp = itp || {};
 
 			itp.table.addEventListener("click", itp._clickGrid);
 			itp.table.addEventListener("dblclick", itp._dblclickGrid);
-			
+			document.body.addEventListener("keyup", itp._keyup);
+			console.log(document.body);
+		//	itp.table.addEventListener("keyup", itp._keyup);
+
+				
 			document.querySelector('.table').onscroll = function() {
 				var needAddC = this.scrollWidth - (this.clientWidth + this.scrollLeft),
 					needAddR = this.scrollHeight - (this.clientHeight + this.scrollTop);
@@ -103,6 +114,10 @@ var itp = itp || {};
 			document.querySelector('main').style.display = "block";
 
 		}
+	}
+
+	itp._clickGrid = function (e) { 
+		if (e.target.nodeName === "TD") { e.target.classList.toggle("selected"); }
 	}
 
 	itp._dblclickGrid = function (e) {		// при нажатии на ячейку
@@ -129,15 +144,22 @@ var itp = itp || {};
 		}
 	}
 
-	itp._clickGrid = function (e) { 
-		if (e.target.nodeName === "TD") { e.target.classList.toggle("selected"); }
+	itp._keyup = function (e) {
+		var td = document.querySelector('td.selected:hover');
+
+		console.log(e.target.nodeName);
+		if (e.target.nodeName === "TD") {
+			console.log(td);
+		}
 	}
 
+	
 	itp._addRow = function (n) {
 		var c;
 
 		itp.tbody.insertRow(itp.rCount);
 		itp.tableRow.insertRow(itp.rCount).insertCell(0).outerHTML = "<th>" + (+itp.rCount + 1) + "</th>";
+		console.log(+itp.rCount + 1);
 
 		for (c = 0; c < itp.cCount; c++) {
 			itp.tbody.rows[itp.rCount].insertCell(c);
@@ -183,10 +205,25 @@ var itp = itp || {};
 		return arr.join("");
 	}
 
+	itp._getJSONData = function (path, callback) {
+   		var httpRequest = new XMLHttpRequest();
+
+  		httpRequest.onreadystatechange = function () {
+        	if (httpRequest.readyState === 4) {
+            	if (httpRequest.status === 200) {
+                	itp.JSONdata = JSON.parse(httpRequest.responseText);
+                	if (callback) { callback(itp.JSONdata); }
+           		}
+       		}
+    	};
+    	httpRequest.open('GET', path);
+    	httpRequest.send(); 
+	}
+
+
 
 
 document.addEventListener("DOMContentLoaded", itp.init);
-
 
 
 
