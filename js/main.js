@@ -29,8 +29,12 @@ var itp = itp || {};
 		document.querySelector('#btnGetJSON').addEventListener("click", function () {
 			itp._getJSONData('http://keramet.kh.ua/json.php',  function () {
     			document.querySelector('#outputJSON').innerHTML = JSON.stringify(itp.JSONdata);
+    			itp.showCurent();
 			});
+		//	itp.showCurent();
 		});
+
+		if (itp.showCurent) itp.showCurent();
 	}
 
 	itp._createTabs = function () {
@@ -77,6 +81,7 @@ var itp = itp || {};
 
 				itp._clearTables();
 				itp._fillSheet();
+				itp.showCurent();
 			//	console.log( itp.data );
 				console.log( Date.now() - t );
 
@@ -137,12 +142,32 @@ var itp = itp || {};
 
 				if (needAddC < itp._config.cell.width) itp._addCol(1);
 				if (needAddR < itp._config.cell.height) itp._addRow(1);
+
+				itp.showCurent();
 			}
 
 			itp._isCreate = true;	// отслеживает, была ли создана таблица
+
+			itp.showCurent();
+
 			document.querySelector('main').style.display = "block";
 
 		}
+	}
+
+	itp.showCurent = function () {
+		var outputCurrent = "#outputCurrentState";
+
+		document.querySelector(outputCurrent).innerHTML = "<b>itp.data.length:  \t </b>" +  +itp.data.length  +
+														 "\t  <b>itp.aShIndex:  \t </b>" +  itp.aShIndex  + 
+														 "\t <b>itp.aSh.name:  \t </b>" + (itp.aSh? itp.aSh.name : itp.aSh) + "<br>" +
+													 	 "<b>itp.JSONdata:  \t </b>" + JSON.stringify( itp.JSONdata ) + "<br>"; 
+	//	console.dir( document.getElementById(outputCurrent) );
+		console.log( "___________________");
+		console.log( "itp.aSh (активный лист - АЛ):");
+		console.dir( itp.aSh );
+		console.log( JSON.stringify(itp.aSh) );
+
 	}
 
 	itp._fillSheet = function () {
@@ -215,9 +240,9 @@ var itp = itp || {};
 				this.parentNode.classList.remove("input");	//	можно так:	this.parentNode.class = "";
 				this.parentNode.innerHTML = this.value;
 				itp.aSh.cells[cell] = this.value;
-				
-				console.log( "cells[" + cell + "] = " + this.value);
-				console.dir(itp.aSh);
+
+				itp.showCurent();
+
 			};
 
 			input.onkeyup = function (e) {

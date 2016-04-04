@@ -15,6 +15,10 @@ header {
 	border-radius: 4px;
 	padding: 7px;
 	background: #AAD4B9;
+	min-height: 150px;
+	clear: both;
+	height: auto;
+	overflow: all;
 }
 
 main {
@@ -173,9 +177,24 @@ fieldset {
 	display: inline-block;
 	text-align: center;
 	vertical-align: top;
+	float: left;
+	width: 20%;
+
 }
+fieldset:last-child {
+	float: right;
+	border: 1px dotted gray;
+	width: 30%;
+	height: auto;
+	overflow: auto;
+	overflow-y: scroll;
+}
+	#outputCurrentState {
+		text-align: left;
+		border:none;
+	}
 input[type=number] {
-	width: 60px;
+	width: 50px;
 };
 label {
 	width: 150px;
@@ -183,7 +202,7 @@ label {
 }
 #outputJSON {
 	border: none;
-	font-weight: bolder;
+/*	font-weight: bolder;		*/
 	padding: 5px;
 }
 

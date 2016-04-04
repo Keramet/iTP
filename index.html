@@ -12,22 +12,27 @@
 		<fieldset>
 			<legend>Таблица</legend>
 		
-			<label>Количество строк:
+			<label>Cтрок:
 				<input type="number" id="rCount"  min="1" required>
 			</label><br>
-			<label>Количество столбцов:
+			<label>Cтолбцов:
 				<input type="number" id=cCount min="1" required>
 			</label>
 			<br>
 			<label><i>Автосоздание</i>
 				<input type="checkbox" name="autoCreate">
-			</label>
+			</label><br>
 			<button id="btnCreate" autofocus>Создать</button>
 		</fieldset>
 		<fieldset>
 			<legend>JSON</legend>
 			<button id="btnGetJSON">Получить JSON</button><br>
 			<div id="outputJSON"></div>	
+		</fieldset>
+		<fieldset>
+			<legend><i>Текущее состояние</i></legend>
+				<!-- <button id="btnClick">Клик ...</button><br>-->
+			<div id="outputCurrentState"></div>	
 		</fieldset>
 
 	</header>
