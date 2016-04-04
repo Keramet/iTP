@@ -5,6 +5,7 @@ var itp = itp || {};
 	itp._config = {
 		rCount: 20,
 		cCount: 20,
+		scrollSize: 16,		// px
 		cell: { width: 100, height: 30 },	// px;
 		sheets: [ "Лист 1", "Лист 2", "Лист 3", "Лист 4" ]
 	}
@@ -16,56 +17,75 @@ var itp = itp || {};
 		rCountInput.value = itp._config.rCount;
 		cCountInput.value = itp._config.cCount;
 
+		itp.data = [];	// листы
+
 		document.querySelector('#btnCreate').addEventListener("click", function () {
-			itp.rCount = rCountInput.value;
-			itp.cCount = cCountInput.value;
+			itp.rCount = +rCountInput.value;
+			itp.cCount = +cCountInput.value;
 			itp._createTabs();
-		//	itp._clickTabs();
 			itp._createTables();
 		});
 
 		document.querySelector('#btnGetJSON').addEventListener("click", function () {
-			itp._getJSONData('http://keramet.kh.ua/json.php', function(data){
-    			document.querySelector('#outputJSON').innerHTML = JSON.stringify(data) + "<br>" + JSON.stringify(itp.JSONdata);
+			itp._getJSONData('http://keramet.kh.ua/json.php',  function () {
+    			document.querySelector('#outputJSON').innerHTML = JSON.stringify(itp.JSONdata);
 			});
 		});
 	}
 
 	itp._createTabs = function () {
-		var tab,
-			sheetsTab = document.querySelector("div.sheetsTab");
+		var tab, sheetsTab = document.querySelector("div.sheetsTab");
 
 		if (itp._isCreate) return "_isCreate";
 		itp._config.sheets.forEach( function (el, i) {
+			itp.data[i] = { name: el };	
 			tab = document.createElement("a");
 			tab.href = "#";
 			tab.innerHTML = "<span" + ( (!i) ? " class='active'" : "" ) + ">" + el + "</span>";
 			sheetsTab.appendChild(tab);
-		//	console.log(tab);
 		});
+
+		if ( !itp.aSh ) {	//	ссылка на активный лист
+			itp.aSh = itp.data[0];		
+			itp.aShIndex = 0;			//  индекс АЛ в массиве itp.data
+			itp.data[0]["active"] = true;
+		}
+
 		itp._clickTabs();
 	}
 
 	itp._clickTabs = function () {
 		var allTabs = [].slice.call(document.querySelectorAll(".sheetsTab a span"));
-	//	var allTabs = document.querySelectorAll(".sheetsTab a span");
 
-	//	if (itp._isCreate) return "_isCreate";
-		allTabs.forEach(function(tab) {
+		allTabs.forEach( function (tab) {
 			tab.onclick	= function (e) {
+				var t = Date.now();
 				var tabs = document.querySelectorAll(".sheetsTab a span");
 
-				[].slice.call(tabs).forEach( function (item) {
+				if ( e.target.classList.contains("active") ) return;
+
+				[].slice.call(tabs).forEach( function (item, i) {
 				 	item.classList.remove("active"); 
+				 	if (itp.data[i].active) { itp.data[i].active = false; } 	// нужна ли проверка? (сразу itp.data[i].active = false; )
+				 	if (item === e.target) { 
+				 		itp.data[i].active = true;
+				 		itp.aSh = itp.data[i];
+				 		itp.aShIndex = i;
+				 	}
 				});
 				e.target.classList.add("active");
+
+				itp._clearTables();
+				itp._fillSheet();
+			//	console.log( itp.data );
+				console.log( Date.now() - t );
+
 				return false;
 			}
 		});
 	}
 		
 	itp._createTables = function () {
-		var r, c, scrlSize = 16;
 
 		itp.table = document.querySelector('#itpTable');
 		itp.tableCol = document.querySelector('#itpTableCol');
@@ -74,10 +94,19 @@ var itp = itp || {};
 
 		if (itp._isCreate) { alert("Таблица уже создана!"); }
 		else {
-			itp.table.width  = itp.cCount * itp._config.cell.width + scrlSize + "px";
-			itp.table.height = itp.rCount * itp._config.cell.height + scrlSize + "px";
+			itp._fillSheet();
+		/*
+			itp.table.width  = itp.cCount * itp._config.cell.width + itp._config.scrollSize + "px";
+			itp.table.height = itp.rCount * itp._config.cell.height + itp._config.scrollSize + "px";
 			itp.tableCol.width = itp.table.width;
 			itp.tableRow.height = itp.table.height;
+
+			
+			if (!itp.aSh.cells) {
+				itp.aSh.cells = {};
+				itp.aSh.rCount = itp.rCount;
+				itp.aSh.cCount = itp.cCount;
+			}
 
 			for (r = 0; r < itp.rCount; r++) {
 				itp.tbody.insertRow(r);
@@ -91,11 +120,11 @@ var itp = itp || {};
 					itp.tbody.rows[r].insertCell(c);
 				}
 			}
+		*/
 
 			itp.table.addEventListener("click", itp._clickGrid);
 			itp.table.addEventListener("dblclick", itp._dblclickGrid);
-			document.body.addEventListener("keyup", itp._keyup);
-			console.log(document.body);
+			document.body.addEventListener("keyup", itp._keyup, true);
 		//	itp.table.addEventListener("keyup", itp._keyup);
 
 				
@@ -116,8 +145,59 @@ var itp = itp || {};
 		}
 	}
 
+	itp._fillSheet = function () {
+		var r, c, cell;
+
+		if ( !itp.aSh ) alert("Нет активного листа!");
+
+		if ( !itp.aSh.cells ) {
+			itp.aSh.cells = {};
+			itp.aSh.rCount = itp._config.rCount;
+			itp.aSh.cCount = itp._config.cCount;
+		}	
+
+		itp.table.width  = itp.aSh.cCount * itp._config.cell.width + itp._config.scrollSize + "px";
+		itp.table.height = itp.aSh.rCount * itp._config.cell.height + itp._config.scrollSize + "px";
+		itp.tableCol.width = itp.table.width;
+		itp.tableRow.height = itp.table.height;
+
+		for (r = 0; r < itp.aSh.rCount; r++) {
+			itp.tbody.insertRow(r);
+			itp.tableRow.insertRow(r).insertCell(0).outerHTML = "<th>" + (r + 1) + "</th>";
+
+			for (c = 0; c < itp.aSh.cCount; c++) {
+				if (r === 0) { 
+					if (c === 0 ) { itp.tableCol.insertRow(0) };
+					itp.tableCol.rows[0].insertCell(c).outerHTML = "<th>" + itp._colName(c) + "</th>";
+				}
+				cell = itp._colName(c) + (r + 1);
+				itp.tbody.rows[r].insertCell(c).innerHTML = itp.aSh.cells[cell] ? itp.aSh.cells[cell] : "";
+			}
+		}
+	}
+
+	itp._clearTables = function () {
+		itp.tableCol.innerHTML = "";
+		itp.tableRow .innerHTML = "";
+		itp.tbody.innerHTML = "";
+	}
+
+
+		// может, лучше хранить ссылку на активный лист вместо функции определения АЛ ??
+	itp.activeSheet = function () {		
+		var n;
+
+		itp.data.forEach( function (el, i) {
+			if (el.active) { n = i; }
+		});
+		return n;
+	}
+
 	itp._clickGrid = function (e) { 
-		if (e.target.nodeName === "TD") { e.target.classList.toggle("selected"); }
+		if (e.target.nodeName === "TD") { 
+			e.target.classList.toggle("selected");
+			
+		}
 	}
 
 	itp._dblclickGrid = function (e) {		// при нажатии на ячейку
@@ -130,8 +210,14 @@ var itp = itp || {};
 			input.value = e.target.innerHTML;
 
 			input.onblur = function () {
+				var cell = itp._colName(e.target.cellIndex) + (e.target.parentNode.rowIndex + 1);
+
 				this.parentNode.classList.remove("input");	//	можно так:	this.parentNode.class = "";
 				this.parentNode.innerHTML = this.value;
+				itp.aSh.cells[cell] = this.value;
+				
+				console.log( "cells[" + cell + "] = " + this.value);
+				console.dir(itp.aSh);
 			};
 
 			input.onkeyup = function (e) {
@@ -147,25 +233,25 @@ var itp = itp || {};
 	itp._keyup = function (e) {
 		var td = document.querySelector('td.selected:hover');
 
-		console.log(e.target.nodeName);
-		if (e.target.nodeName === "TD") {
-			console.log(td);
-		}
+	//	console.log(e.target.nodeName);
+	//	console.log(e.target);
+	//	console.log(e.currentTarget);
+
+		if (td) { console.log(td); }
 	}
 
 	
-	itp._addRow = function (n) {
+	itp._addRow = function (n) {	
 		var c;
 
-		itp.tbody.insertRow(itp.rCount);
-		itp.tableRow.insertRow(itp.rCount).insertCell(0).outerHTML = "<th>" + (+itp.rCount + 1) + "</th>";
-		console.log(+itp.rCount + 1);
+		itp.tbody.insertRow(itp.aSh.rCount);
+		itp.tableRow.insertRow(itp.aSh.rCount).insertCell(0).outerHTML = "<th>" + (itp.aSh.rCount + 1) + "</th>";
 
-		for (c = 0; c < itp.cCount; c++) {
-			itp.tbody.rows[itp.rCount].insertCell(c);
+		for (c = 0; c < itp.aSh.cCount; c++) {
+			itp.tbody.rows[itp.aSh.rCount].insertCell(c);
 		}
 	
-		itp.rCount++;
+		itp.aSh.rCount++;
 		itp.table.height = (itp.table.scrollHeight + itp._config.cell.height) + "px";
 		itp.tableRow.height = itp.table.height;
 	}
@@ -173,20 +259,19 @@ var itp = itp || {};
 	itp._addCol = function (n) {
 		var r;
 
-		itp.tableCol.rows[0].insertCell(itp.cCount).outerHTML = "<th>" + itp._colName(itp.cCount) + "</th>";
+		itp.tableCol.rows[0].insertCell(itp.aSh.cCount).outerHTML = "<th>" + itp._colName(itp.aSh.cCount) + "</th>";
 
-		for (r = 0; r < itp.rCount; r++) {
-			itp.tbody.rows[r].insertCell(itp.cCount);
+		for (r = 0; r < itp.aSh.rCount; r++) {
+			itp.tbody.rows[r].insertCell(itp.aSh.cCount);
 		}
 
-		itp.cCount++;
+		itp.aSh.cCount++;
 		itp.table.width = (itp.table.scrollWidth + itp._config.cell.width) + "px";
 		itp.tableCol.width = itp.table.width;	
 	}
 
 	itp._colName = function (n) {		
-		var startChar = "A",
-			endChar = "Z",
+		var startChar = "A",  endChar = "Z",
 			chCount = endChar.charCodeAt(0) - startChar.charCodeAt(0) + 1,
 			arr = [];
 
@@ -212,13 +297,14 @@ var itp = itp || {};
         	if (httpRequest.readyState === 4) {
             	if (httpRequest.status === 200) {
                 	itp.JSONdata = JSON.parse(httpRequest.responseText);
-                	if (callback) { callback(itp.JSONdata); }
+                	if (callback) { callback(); }
            		}
        		}
-    	};
-    	httpRequest.open('GET', path);
-    	httpRequest.send(); 
+		};
+		httpRequest.open('GET', path);
+		httpRequest.send(); 
 	}
+
 
 
 

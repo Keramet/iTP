@@ -13,54 +13,45 @@
 			<legend>Таблица</legend>
 		
 			<label>Количество строк:
-				<input type="number" id="rCount"  min="1" required autofocus>
+				<input type="number" id="rCount"  min="1" required>
 			</label><br>
 			<label>Количество столбцов:
 				<input type="number" id=cCount min="1" required>
 			</label>
 			<br>
-			<!--<label> <i>Заголовки столбцов:</i>
-				<select name="colType">
-					<option value="alph">[A-Z]</option>
-					<option value="numb">[1, 2, ...]</option>
-				</select>
-			</label> -->
-			<button id="btnCreate">Создать</button>
+			<label><i>Автосоздание</i>
+				<input type="checkbox" name="autoCreate">
+			</label>
+			<button id="btnCreate" autofocus>Создать</button>
 		</fieldset>
 		<fieldset>
 			<legend>JSON</legend>
-			<button id="btnGetJSON">Получить JSON</button>
+			<button id="btnGetJSON">Получить JSON</button><br>
 			<div id="outputJSON"></div>	
 		</fieldset>
 
 	</header>
 		
 	<main>
-		<div>
-			<div class="sheetsTab">
-
+		<div class="sheetsTab"></div>
+		<div class="sheet active">	
+			<div>
+				<div class="empty"></div>
+				<div class="colHeader">
+					<table id='itpTableCol'></table>
+				</div>
 			</div>
-			<div class="empty"></div>
-			<div class="colHeader">
-				<table id='itpTableCol'>
-
-				</table>
+			<div>
+				<div class="rowHeader">
+					<table id='itpTableRow'></table>
+				</div>
+				<div class="table">
+					<table id='itpTable'>
+						<tbody></tbody>
+					</table>
+				</div>
 			</div>
-		</div>
-		<div>
-			<div class="rowHeader">
-				<table id='itpTableRow'>
-
-				</table>
-			</div>
-			<div class="table">
-				<table id='itpTable'>
-					<tbody>
-						
-					</tbody>
-				</table>
-			</div>
-		</div>
+		</div>	
 	</main>
 		
 		
