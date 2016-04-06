@@ -3,27 +3,52 @@
 var itp = itp || {};
 	
 	itp._config = {
-		rCount: 20,
-		cCount: 20,
+		rCount: 	20,
+		cCount: 	20,
 		scrollSize: 16,		// px
-		cell: { width: 100, height: 30 },	// px;
-		sheets: [ "Лист 1", "Лист 2", "Лист 3", "Лист 4" ]
+		cell: 		{ width: 100, height: 30 },	// px;
+		sheets: 	[ "Лист 1", "Лист 2", "Лист 3", "Лист 4" ],
+		hideSheets: true
 	}
+
 
 	itp.init = function () {
 		var rCountInput = document.querySelector('#rCount'),
-			cCountInput = document.querySelector('#cCount');
+			cCountInput = document.querySelector('#cCount'),
+			select = document.querySelector('select');
+			
+		document.querySelector('select').selectedIndex = itp._config.hideSheets ? 1 : 0;
 			
 		rCountInput.value = itp._config.rCount;
 		cCountInput.value = itp._config.cCount;
-
-		itp.data = [];	// листы
+	
+	//	itp.data =  localStorage.dataLS? JSON.parse(localStorage.dataLS) : [];	// листы
 
 		document.querySelector('#btnCreate').addEventListener("click", function () {
 			itp.rCount = +rCountInput.value;
 			itp.cCount = +cCountInput.value;
+
+			itp.data = [];
+			itp._config.sheets.forEach( function (el, i) {
+				itp.data[i] = { name: el };	
+			});
+			itp.aShIndex = 0;	
+			itp.aSh = itp.data[ itp.aShIndex ];		
+			itp.aSh["active"] = true;
+
+			itp._config.hideSheets = document.querySelector('select').selectedIndex ? true : false ;
+
 			itp._createTabs();
-			itp._createTables();
+		});
+
+		document.querySelector('#btnRestore').addEventListener("click", function () {
+			itp.data 	 = JSON.parse( localStorage.dataLS );
+			itp.aShIndex = itp.activeSheet();
+			itp.aSh 	 = itp.data[ itp.aShIndex ];	
+
+			itp._config.hideSheets = document.querySelector('select').selectedIndex ? true : false ;
+
+			itp._createTabs();
 		});
 
 		document.querySelector('#btnGetJSON').addEventListener("click", function () {
@@ -31,182 +56,254 @@ var itp = itp || {};
     			document.querySelector('#outputJSON').innerHTML = JSON.stringify(itp.JSONdata);
     			itp.showCurent();
 			});
-		//	itp.showCurent();
 		});
-
-		if (itp.showCurent) itp.showCurent();
-	}
+	}		//	end of  itp.init
 
 	itp._createTabs = function () {
-		var tab, sheetsTab = document.querySelector("div.sheetsTab");
+		var tab, sheet, 
+			sheetsTab = document.querySelector("div.sheetsTab"),
+			main = document.querySelector("main"),
+			sheetInnerHTML = document.querySelector("div.sheet").innerHTML;		// может, как-то подключить шаблон
 
-		if (itp._isCreate) return "_isCreate";
-		itp._config.sheets.forEach( function (el, i) {
-			itp.data[i] = { name: el };	
+		if (itp._isCreate) {
+			alert ("Таблица уже создана. Для пересоздания обновите страницу!");
+			return "_isCreate";
+		}
+
+		itp.data.forEach( function (el, i) {
 			tab = document.createElement("a");
 			tab.href = "#";
-			tab.innerHTML = "<span" + ( (!i) ? " class='active'" : "" ) + ">" + el + "</span>";
+			tab.innerHTML = "<span" + ( el.active ? " class='active'" : "" ) + ">" + el.name + "</span>";
+			tab.onclick = itp._onclickTab;
 			sheetsTab.appendChild(tab);
-		});
 
-		if ( !itp.aSh ) {	//	ссылка на активный лист
-			itp.aSh = itp.data[0];		
-			itp.aShIndex = 0;			//  индекс АЛ в массиве itp.data
-			itp.data[0]["active"] = true;
+			if (itp._config.hideSheets) {	
+				if (i) {						// создаём дивы для листов (при скрытии)
+					sheet = document.createElement("div");
+					sheet.className = 'sheet';
+					sheet.id = "sh-" + i;
+					sheet.innerHTML = sheetInnerHTML;
+					main.appendChild(sheet);
+				}
+				itp._createSheets(i);
+				if (el.active) { document.getElementById('sh-' + i).classList.add("active"); }
+			}
+		});	
+
+		if ( !itp._config.hideSheets ) {
+			document.getElementById('sh-0').classList.add("active");
+			itp._createSheets();
 		}
 
-		itp._clickTabs();
+		itp._isCreate = true;
 	}
 
-	itp._clickTabs = function () {
-		var allTabs = [].slice.call(document.querySelectorAll(".sheetsTab a span"));
 
-		allTabs.forEach( function (tab) {
-			tab.onclick	= function (e) {
-				var t = Date.now();
-				var tabs = document.querySelectorAll(".sheetsTab a span");
+	itp._onclickTab = function (e) {
+		var t = Date.now(),
+			tabs = document.querySelectorAll(".sheetsTab a span");
 
-				if ( e.target.classList.contains("active") ) return;
+		if ( e.target.classList.contains("active") ) return;
 
-				[].slice.call(tabs).forEach( function (item, i) {
-				 	item.classList.remove("active"); 
-				 	if (itp.data[i].active) { itp.data[i].active = false; } 	// нужна ли проверка? (сразу itp.data[i].active = false; )
-				 	if (item === e.target) { 
-				 		itp.data[i].active = true;
-				 		itp.aSh = itp.data[i];
-				 		itp.aShIndex = i;
-				 	}
-				});
-				e.target.classList.add("active");
-
-				itp._clearTables();
-				itp._fillSheet();
-				itp.showCurent();
-			//	console.log( itp.data );
-				console.log( Date.now() - t );
-
-				return false;
-			}
+		[].slice.call(tabs).forEach( function (item, i) {
+		 	item.classList.remove("active"); 
+		 	if (itp.data[i].active) { itp.data[i].active = false; } 	// нужна ли проверка? (сразу itp.data[i].active = false; )
+		 	
+		 	if (item === e.target) {
+		 		if ( itp._config.hideSheets ) {
+		 			document.getElementById('sh-' + itp.aShIndex).classList.remove("active");
+		 			document.getElementById('sh-' + i).classList.add("active");
+		 		} 
+		 		itp.data[i].active = true;
+		 		itp.aSh = itp.data[i];
+		 		itp.aShIndex = i;
+		 	}
 		});
-	}
 		
-	itp._createTables = function () {
+		e.target.classList.add("active");
 
-		itp.table = document.querySelector('#itpTable');
-		itp.tableCol = document.querySelector('#itpTableCol');
-		itp.tableRow = document.querySelector('#itpTableRow');
-		itp.tbody = itp.table.getElementsByTagName('tbody')[0];
+		if ( !itp._config.hideSheets ) {
+			itp._clearSheet();
+			itp._createSheets();
+		}
+		
+		console.log( "Время на смену листа, мс: " + (Date.now() - t) );
 
-		if (itp._isCreate) { alert("Таблица уже создана!"); }
-		else {
-			itp._fillSheet();
-		/*
-			itp.table.width  = itp.cCount * itp._config.cell.width + itp._config.scrollSize + "px";
-			itp.table.height = itp.rCount * itp._config.cell.height + itp._config.scrollSize + "px";
-			itp.tableCol.width = itp.table.width;
-			itp.tableRow.height = itp.table.height;
+		itp._saveToLS();
+		return false;
+	}
 
-			
-			if (!itp.aSh.cells) {
-				itp.aSh.cells = {};
-				itp.aSh.rCount = itp.rCount;
-				itp.aSh.cCount = itp.cCount;
-			}
+	
+	itp._createSheets = function (sheetIndex) {
+		var sheetIndex = sheetIndex || 0,
+			sheet = document.getElementById("sh-" + sheetIndex),
+			tableCol = sheet.querySelector('.itpTableCol'),
+			tableRow = sheet.querySelector('.itpTableRow'),
+			tableGrid = sheet.querySelector('.itpTable'),
+			tbodyGrid = tableGrid.getElementsByTagName('tbody')[0];
+		
 
-			for (r = 0; r < itp.rCount; r++) {
-				itp.tbody.insertRow(r);
-				itp.tableRow.insertRow(r).insertCell(0).outerHTML = "<th>" + (r + 1) + "</th>";
+		if ( !tableCol.rows.length ) {		// были ли для этого дива созданы таблицы 
+			itp._config.hideSheets ? __fillSheet(sheetIndex) : __fillSheet(itp.aShIndex);
 
-				for (c = 0; c < itp.cCount; c++) {
+		//	tableGrid.addEventListener("click", __clickGrid);
+		//	tableGrid.addEventListener("dblclick", __dblclickGrid);
+
+			tableGrid.onclick 	 = __clickGrid;
+			tableGrid.ondblclick = __dblclickGrid;
+			sheet.querySelector('.table').onscroll = __onScroll;
+		}
+
+
+		function __fillSheet(n) {
+			var r, c, cell;
+
+			if ( !itp.data[n] ) { alert("Нет такого листа!");	}	// может, Throw  Error ?
+
+			if ( !itp.data[n].cells ) {
+				itp.data[n].cells = {};
+				itp.data[n].rCount = itp.rCount || itp._config.rCount;
+				itp.data[n].cCount = itp.cCount || itp._config.cCount;
+			}	
+
+			tableGrid.width  = itp.data[n].cCount * itp._config.cell.width + itp._config.scrollSize + "px";
+			tableGrid.height = itp.data[n].rCount * itp._config.cell.height + itp._config.scrollSize + "px";
+			tableCol.width 	 = tableGrid.width;
+			tableRow.height  = tableGrid.height;
+
+			for (r = 0; r < itp.data[n].rCount; r++) {
+				tbodyGrid.insertRow(r);
+				tableRow.insertRow(r).insertCell(0).outerHTML = "<th>" + (r + 1) + "</th>";
+
+				for (c = 0; c < itp.data[n].cCount; c++) {
 					if (r === 0) { 
-						if (c === 0 ) { itp.tableCol.insertRow(0) };
-						itp.tableCol.rows[0].insertCell(c).outerHTML = "<th>" + itp._colName(c) + "</th>";
-					 }
-					itp.tbody.rows[r].insertCell(c);
+						if (c === 0 ) { tableCol.insertRow(0) };
+						tableCol.rows[0].insertCell(c).outerHTML = "<th>" + itp._colName(c) + "</th>";
+					}
+
+					cell = itp._colName(c) + (r + 1);
+					tbodyGrid.rows[r].insertCell(c).innerHTML = itp.data[n].cells[cell] ? itp.data[n].cells[cell] : "";
 				}
 			}
-		*/
+		}		// end of  __fillSheet
 
-			itp.table.addEventListener("click", itp._clickGrid);
-			itp.table.addEventListener("dblclick", itp._dblclickGrid);
-			document.body.addEventListener("keyup", itp._keyup, true);
-		//	itp.table.addEventListener("keyup", itp._keyup);
 
-				
-			document.querySelector('.table').onscroll = function() {
-				var needAddC = this.scrollWidth - (this.clientWidth + this.scrollLeft),
-					needAddR = this.scrollHeight - (this.clientHeight + this.scrollTop);
+		function __clickGrid(e) { 
+			if (e.target.nodeName === "TD")  { e.target.classList.toggle("selected"); }
+		}
 
-				itp.tableRow.style.top  = -this.scrollTop  + "px";
-				itp.tableCol.style.left = -this.scrollLeft + "px";
+		function __dblclickGrid(e) {		// при нажатии на ячейку
+			var input; 
 
-				if (needAddC < itp._config.cell.width) itp._addCol(1);
-				if (needAddR < itp._config.cell.height) itp._addRow(1);
+			if (e.target.nodeName === "TD") {
+		
+				e.target.className = "input";
+				input = document.createElement("input");
+				input.className = "inGrid";
+				console.dir(e.target.innerHTML);
+				console.dir(this.innerHTML);
+				input.value = e.target.innerHTML;
 
-				itp.showCurent();
+				input.onblur = function () {
+					var cell =	itp._colName(e.target.cellIndex) +
+								(e.target.parentNode.rowIndex + 1);
+
+					this.parentNode.classList.remove("input");	//	можно так:	this.parentNode.class = "";
+					this.parentNode.innerHTML = this.value;
+					itp.aSh.cells[cell] = this.value;
+					itp._saveToLS();
+				};
+
+				input.onkeyup = function (e) {
+					if (e.keyCode === 13) this.blur();
+				}
+
+				e.target.innerHTML = "";
+				e.target.appendChild(input);
+				input.focus();
+			}
+		}		// end  of  __dblclickGrid
+
+
+		function __onScroll() {
+			var needAddC = this.scrollWidth - (this.clientWidth + this.scrollLeft),
+				needAddR = this.scrollHeight - (this.clientHeight + this.scrollTop);
+
+			tableRow.style.top  = -this.scrollTop  + "px";
+			tableCol.style.left = -this.scrollLeft + "px";
+
+			if (needAddC < itp._config.cell.width)  __addCol();
+			if (needAddR < itp._config.cell.height) __addRow();
+		}
+
+
+		function __addRow() {	
+			var sheet = document.querySelector("div.sheet.active"),
+				tableRow = sheet.querySelector('.itpTableRow'),
+				tableGrid = sheet.querySelector('.itpTable'),
+				tbodyGrid = tableGrid.getElementsByTagName('tbody')[0],
+				c;
+
+			tbodyGrid.insertRow(itp.aSh.rCount);
+			tableRow.insertRow(itp.aSh.rCount).insertCell(0).outerHTML = "<th>" + (itp.aSh.rCount + 1) + "</th>";
+
+			for (c = 0; c < itp.aSh.cCount; c++) {
+				tbodyGrid.rows[itp.aSh.rCount].insertCell(c);
+			}
+	
+			itp.aSh.rCount++;
+			tableGrid.height = (tableGrid.scrollHeight + itp._config.cell.height) + "px";
+			tableRow.height = tableGrid.height;
+		}
+
+		function __addCol() {
+			var sheet = document.querySelector("div.sheet.active"),
+				tableCol = sheet.querySelector('.itpTableCol'),
+				tableGrid = sheet.querySelector('.itpTable'),
+				tbodyGrid = tableGrid.getElementsByTagName('tbody')[0],
+				r;
+
+			tableCol.rows[0].insertCell(itp.aSh.cCount).outerHTML = "<th>" + itp._colName(itp.aSh.cCount) + "</th>";
+
+			for (r = 0; r < itp.aSh.rCount; r++) {
+				tbodyGrid.rows[r].insertCell(itp.aSh.cCount);
 			}
 
-			itp._isCreate = true;	// отслеживает, была ли создана таблица
-
-			itp.showCurent();
-
-			document.querySelector('main').style.display = "block";
-
+			itp.aSh.cCount++;
+			tableGrid.width = (tableGrid.scrollWidth + itp._config.cell.width) + "px";
+			tableCol.width = tableGrid.width;	
 		}
+
+	}		// end of  itp._createSheets
+
+
+	itp._clearSheet = function () {
+		var sheet = document.querySelector("div.sheet.active"),
+			tableGrid = sheet.querySelector('.itpTable');
+
+		sheet.querySelector('.itpTableCol').innerHTML = "";
+		sheet.querySelector('.itpTableRow').innerHTML = "",
+		tableGrid.getElementsByTagName('tbody')[0].innerHTML = "";
 	}
 
 	itp.showCurent = function () {
 		var outputCurrent = "#outputCurrentState";
 
-		document.querySelector(outputCurrent).innerHTML = "<b>itp.data.length:  \t </b>" +  +itp.data.length  +
-														 "\t  <b>itp.aShIndex:  \t </b>" +  itp.aShIndex  + 
-														 "\t <b>itp.aSh.name:  \t </b>" + (itp.aSh? itp.aSh.name : itp.aSh) + "<br>" +
-													 	 "<b>itp.JSONdata:  \t </b>" + JSON.stringify( itp.JSONdata ) + "<br>"; 
-	//	console.dir( document.getElementById(outputCurrent) );
-		console.log( "___________________");
-		console.log( "itp.aSh (активный лист - АЛ):");
+		document.querySelector(outputCurrent).innerHTML = "<b>itp.data.length:  \t </b>" +  +itp.data.length  + "<br>" +
+														  "<b>itp.aShIndex:  \t </b>" +  itp.aShIndex  +  "<br>" +
+														  "<b>itp.aSh.name:  \t </b>" + (itp.aSh? itp.aSh.name : itp.aSh) + "<br>" +
+													 	  "<b>itp.JSONdata:  \t </b>" + JSON.stringify( itp.JSONdata ) + "<br>";
+													 //	  "<b>localStorage.dataLS: </b>" + JSON.stringify( localStorage.dataLS ); 
+
 		console.dir( itp.aSh );
-		console.log( JSON.stringify(itp.aSh) );
-
+		console.log( "itp.aSh (активный лист - АЛ): " + JSON.stringify(itp.aSh) );
 	}
 
-	itp._fillSheet = function () {
-		var r, c, cell;
-
-		if ( !itp.aSh ) alert("Нет активного листа!");
-
-		if ( !itp.aSh.cells ) {
-			itp.aSh.cells = {};
-			itp.aSh.rCount = itp._config.rCount;
-			itp.aSh.cCount = itp._config.cCount;
-		}	
-
-		itp.table.width  = itp.aSh.cCount * itp._config.cell.width + itp._config.scrollSize + "px";
-		itp.table.height = itp.aSh.rCount * itp._config.cell.height + itp._config.scrollSize + "px";
-		itp.tableCol.width = itp.table.width;
-		itp.tableRow.height = itp.table.height;
-
-		for (r = 0; r < itp.aSh.rCount; r++) {
-			itp.tbody.insertRow(r);
-			itp.tableRow.insertRow(r).insertCell(0).outerHTML = "<th>" + (r + 1) + "</th>";
-
-			for (c = 0; c < itp.aSh.cCount; c++) {
-				if (r === 0) { 
-					if (c === 0 ) { itp.tableCol.insertRow(0) };
-					itp.tableCol.rows[0].insertCell(c).outerHTML = "<th>" + itp._colName(c) + "</th>";
-				}
-				cell = itp._colName(c) + (r + 1);
-				itp.tbody.rows[r].insertCell(c).innerHTML = itp.aSh.cells[cell] ? itp.aSh.cells[cell] : "";
-			}
-		}
+	
+	itp._saveToLS = function () {
+		localStorage.setItem ( "dataLS" , JSON.stringify(itp.data) );
+	//	console.log( localStorage.dataLS ); 
 	}
-
-	itp._clearTables = function () {
-		itp.tableCol.innerHTML = "";
-		itp.tableRow .innerHTML = "";
-		itp.tbody.innerHTML = "";
-	}
-
 
 		// может, лучше хранить ссылку на активный лист вместо функции определения АЛ ??
 	itp.activeSheet = function () {		
@@ -218,43 +315,6 @@ var itp = itp || {};
 		return n;
 	}
 
-	itp._clickGrid = function (e) { 
-		if (e.target.nodeName === "TD") { 
-			e.target.classList.toggle("selected");
-			
-		}
-	}
-
-	itp._dblclickGrid = function (e) {		// при нажатии на ячейку
-		var input; 
-
-		if (e.target.nodeName === "TD") {
-			e.target.className = "input";
-			input = document.createElement("input");
-			input.className = "inGrid";
-			input.value = e.target.innerHTML;
-
-			input.onblur = function () {
-				var cell = itp._colName(e.target.cellIndex) + (e.target.parentNode.rowIndex + 1);
-
-				this.parentNode.classList.remove("input");	//	можно так:	this.parentNode.class = "";
-				this.parentNode.innerHTML = this.value;
-				itp.aSh.cells[cell] = this.value;
-
-				itp.showCurent();
-
-			};
-
-			input.onkeyup = function (e) {
-				if (e.keyCode === 13) this.blur();
-			}
-
-			e.target.innerHTML = "";
-			e.target.appendChild(input);
-			input.focus();
-		}
-	}
-
 	itp._keyup = function (e) {
 		var td = document.querySelector('td.selected:hover');
 
@@ -263,36 +323,6 @@ var itp = itp || {};
 	//	console.log(e.currentTarget);
 
 		if (td) { console.log(td); }
-	}
-
-	
-	itp._addRow = function (n) {	
-		var c;
-
-		itp.tbody.insertRow(itp.aSh.rCount);
-		itp.tableRow.insertRow(itp.aSh.rCount).insertCell(0).outerHTML = "<th>" + (itp.aSh.rCount + 1) + "</th>";
-
-		for (c = 0; c < itp.aSh.cCount; c++) {
-			itp.tbody.rows[itp.aSh.rCount].insertCell(c);
-		}
-	
-		itp.aSh.rCount++;
-		itp.table.height = (itp.table.scrollHeight + itp._config.cell.height) + "px";
-		itp.tableRow.height = itp.table.height;
-	}
-
-	itp._addCol = function (n) {
-		var r;
-
-		itp.tableCol.rows[0].insertCell(itp.aSh.cCount).outerHTML = "<th>" + itp._colName(itp.aSh.cCount) + "</th>";
-
-		for (r = 0; r < itp.aSh.rCount; r++) {
-			itp.tbody.rows[r].insertCell(itp.aSh.cCount);
-		}
-
-		itp.aSh.cCount++;
-		itp.table.width = (itp.table.scrollWidth + itp._config.cell.width) + "px";
-		itp.tableCol.width = itp.table.width;	
 	}
 
 	itp._colName = function (n) {		

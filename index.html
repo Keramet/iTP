@@ -19,10 +19,14 @@
 				<input type="number" id=cCount min="1" required>
 			</label>
 			<br>
-			<label><i>Автосоздание</i>
-				<input type="checkbox" name="autoCreate">
-			</label><br>
+			<i><label title="Переключение листов">Листы
+				<select name="sheetChange" >
+					<option value="reCreate">Пересоздавать</option>	
+					<option value="hide">Прятать</option>	
+				</select>
+			</label></i><br>
 			<button id="btnCreate" autofocus>Создать</button>
+			<button id="btnRestore" title="Восстановить из localStorage">Восстановить</button>
 		</fieldset>
 		<fieldset>
 			<legend>JSON</legend>
@@ -39,19 +43,20 @@
 		
 	<main>
 		<div class="sheetsTab"></div>
-		<div class="sheet active">	
+
+		<div class="sheet" id="sh-0">
 			<div>
 				<div class="empty"></div>
 				<div class="colHeader">
-					<table id='itpTableCol'></table>
+					<table class='itpTableCol'></table>
 				</div>
 			</div>
 			<div>
 				<div class="rowHeader">
-					<table id='itpTableRow'></table>
+					<table class='itpTableRow'></table>
 				</div>
 				<div class="table">
-					<table id='itpTable'>
+					<table class='itpTable'>
 						<tbody></tbody>
 					</table>
 				</div>
