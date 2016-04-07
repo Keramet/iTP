@@ -82,6 +82,15 @@ div.sheet>div:last-child {
 		font-weight: bold;
 		color: white;
 	}
+	.sheetsTab a span.addSheet {
+		width: 50px;
+		margin-right: 100px;
+		background: #B1F6D0;
+		border: 1px solid #0B4124;
+		border-bottom: none;
+		font-weight: bold;
+		color: #0B4124;
+	}
 
 div.empty {
 	background: #AFCDE7;
@@ -209,7 +218,10 @@ label {
 }
 #outputJSON {
 	border: none;
-/*	font-weight: bolder;		*/
 	padding: 5px;
+}
+span.error {
+	color: red;
+	font-weight:bold;
 }
 

@@ -7,7 +7,7 @@ var itp = itp || {};
 		cCount: 	20,
 		scrollSize: 16,		// px
 		cell: 		{ width: 100, height: 30 },	// px;
-		sheets: 	[ "Лист 1", "Лист 2", "Лист 3", "Лист 4" ],
+		sheets: 	[ "Лист 1", "Лист 2", "Лист 3" ],
 		hideSheets: true
 	}
 
@@ -70,6 +70,16 @@ var itp = itp || {};
 			return "_isCreate";
 		}
 
+		tab = document.createElement("a");
+		tab.href = "#";
+		tab.title = "Добавить новый лист";
+		tab.innerHTML = "<span class='addSheet'><b> + </b></span>";
+		tab.onclick = function () {
+			alert("Пока не работает :( ");
+			return	false;
+		}
+		sheetsTab.appendChild(tab); 
+
 		itp.data.forEach( function (el, i) {
 			tab = document.createElement("a");
 			tab.href = "#";
@@ -101,7 +111,7 @@ var itp = itp || {};
 
 	itp._onclickTab = function (e) {
 		var t = Date.now(),
-			tabs = document.querySelectorAll(".sheetsTab a span");
+			tabs = document.querySelectorAll(".sheetsTab a span:not(.addSheet)");
 
 		if ( e.target.classList.contains("active") ) return;
 
@@ -182,7 +192,8 @@ var itp = itp || {};
 					}
 
 					cell = itp._colName(c) + (r + 1);
-					tbodyGrid.rows[r].insertCell(c).innerHTML = itp.data[n].cells[cell] ? itp.data[n].cells[cell] : "";
+					tbodyGrid.rows[r].insertCell(c).innerHTML = itp.data[n].cells[cell] ? 
+						itp.checkFormula( cell, n ) : "";
 				}
 			}
 		}		// end of  __fillSheet
@@ -193,24 +204,29 @@ var itp = itp || {};
 		}
 
 		function __dblclickGrid(e) {		// при нажатии на ячейку
-			var input; 
+			var input, cell; 
 
 			if (e.target.nodeName === "TD") {
-		
+				cell =	itp._colName(e.target.cellIndex) +
+							(e.target.parentNode.rowIndex + 1);
+				console.log(cell);			
 				e.target.className = "input";
 				input = document.createElement("input");
 				input.className = "inGrid";
-				console.dir(e.target.innerHTML);
-				console.dir(this.innerHTML);
-				input.value = e.target.innerHTML;
+				input.value = itp.aSh.cells[cell]? itp.aSh.cells[cell] : "";
+			//	input.value = e.target.innerHTML;
 
 				input.onblur = function () {
 					var cell =	itp._colName(e.target.cellIndex) +
 								(e.target.parentNode.rowIndex + 1);
 
 					this.parentNode.classList.remove("input");	//	можно так:	this.parentNode.class = "";
-					this.parentNode.innerHTML = this.value;
+				//	this.parentNode.innerHTML = this.value;
 					itp.aSh.cells[cell] = this.value;
+					this.parentNode.innerHTML = itp.checkFormula(cell, itp.aShIndex);
+					
+				
+				//	itp.checkFormula(cell, itp.aShIndex);
 					itp._saveToLS();
 				};
 
@@ -303,6 +319,11 @@ var itp = itp || {};
 	itp._saveToLS = function () {
 		localStorage.setItem ( "dataLS" , JSON.stringify(itp.data) );
 	//	console.log( localStorage.dataLS ); 
+
+	//	itp._saveToServer('http://keramet.kh.ua/itpSaveData.php',  function () {
+    //		alert("Данные отправлены на сервер!");
+	//	});
+
 	}
 
 		// может, лучше хранить ссылку на активный лист вместо функции определения АЛ ??
@@ -324,6 +345,30 @@ var itp = itp || {};
 
 		if (td) { console.log(td); }
 	}
+
+	itp.checkFormula = function (cell, sheetIndex) {
+		var txt = itp.data[sheetIndex].cells[cell],
+			output = document.querySelector("#outputCurrentState"),
+			result;
+
+		if (typeof txt === "undefined") return "-" ;	// возвращаю "-" для наглядности		
+		if (txt[0] === "=") { 
+			console.log( "формула" );
+			try 		  { result = new Function("return " + txt.substring(1))(); }
+			catch (error) {	
+				result = "<span class='error'>!</span>";
+				output.innerHTML = 	"<b>Ошибка в формуле: </b>" +
+						itp.data[sheetIndex].name + ", ячейка " + cell  + "<br>";
+				setTimeout(function () { output.innerHTML = ""; }, 2000);
+			}
+		} else 	{
+			result = txt; 
+		}
+
+		console.log(result);
+		return result;
+	}
+
 
 	itp._colName = function (n) {		
 		var startChar = "A",  endChar = "Z",
@@ -358,6 +403,22 @@ var itp = itp || {};
 		};
 		httpRequest.open('GET', path);
 		httpRequest.send(); 
+	}
+
+	itp._saveToServer = function (path, callback) {
+   		var xhr = new XMLHttpRequest();
+
+  		xhr.onreadystatechange = function () {
+        	if (xhr.readyState === 4) {
+            	if (xhr.status === 200) {
+                	console.log(xhr.response);
+                	if (callback) { callback(); }
+           		}
+       		}
+		};
+		xhr.open( 'POST', path );
+	//	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.send( "itpData=" + encodeURIComponent(JSON.stringify(itp.data)) ); 
 	}
 
 
