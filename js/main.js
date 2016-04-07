@@ -35,7 +35,6 @@ var itp = itp || {};
 			itp.aShIndex = 0;	
 			itp.aSh = itp.data[ itp.aShIndex ];		
 			itp.aSh["active"] = true;
-
 			itp._config.hideSheets = document.querySelector('select').selectedIndex ? true : false ;
 
 			itp._createTabs();
@@ -45,16 +44,15 @@ var itp = itp || {};
 			itp.data 	 = JSON.parse( localStorage.dataLS );
 			itp.aShIndex = itp.activeSheet();
 			itp.aSh 	 = itp.data[ itp.aShIndex ];	
-
 			itp._config.hideSheets = document.querySelector('select').selectedIndex ? true : false ;
 
 			itp._createTabs();
 		});
 
 		document.querySelector('#btnGetJSON').addEventListener("click", function () {
-			itp._getJSONData('http://keramet.kh.ua/json.php',  function () {
-    			document.querySelector('#outputJSON').innerHTML = JSON.stringify(itp.JSONdata);
-    			itp.showCurent();
+			itp._getJSONData('http://keramet.kh.ua/itpGetJSON.php',  function () {
+    			console.log( JSON.stringify(itp.JSONdata) );
+    		//	itp.showCurent();
 			});
 		});
 	}		//	end of  itp.init
@@ -209,7 +207,6 @@ var itp = itp || {};
 			if (e.target.nodeName === "TD") {
 				cell =	itp._colName(e.target.cellIndex) +
 							(e.target.parentNode.rowIndex + 1);
-				console.log(cell);			
 				e.target.className = "input";
 				input = document.createElement("input");
 				input.className = "inGrid";
@@ -225,8 +222,6 @@ var itp = itp || {};
 					itp.aSh.cells[cell] = this.value;
 					this.parentNode.innerHTML = itp.checkFormula(cell, itp.aShIndex);
 					
-				
-				//	itp.checkFormula(cell, itp.aShIndex);
 					itp._saveToLS();
 				};
 
@@ -251,7 +246,6 @@ var itp = itp || {};
 			if (needAddC < itp._config.cell.width)  __addCol();
 			if (needAddR < itp._config.cell.height) __addRow();
 		}
-
 
 		function __addRow() {	
 			var sheet = document.querySelector("div.sheet.active"),
@@ -302,6 +296,36 @@ var itp = itp || {};
 		tableGrid.getElementsByTagName('tbody')[0].innerHTML = "";
 	}
 
+
+	itp.checkFormula = function (cell, sheetIndex) {
+		var txt = itp.data[sheetIndex].cells[cell],
+			output = document.querySelector("#outputCurrentState"),
+			result;
+
+		if (typeof txt === "undefined") return "-" ;	// возвращаю "-" для наглядности		
+		if (txt[0] === "=") { 
+			try 		  { result = new Function("return " + txt.substring(1))(); }
+			catch (error) {	
+				result = "<span class='error'>!</span>";
+				output.innerHTML = 	"<b>Ошибка в формуле: </b>" +
+						itp.data[sheetIndex].name + ", ячейка " + cell  + "<br>";
+				setTimeout(function () { output.innerHTML = ""; }, 2000);
+			}
+		} else 	{ result = txt; }
+
+		return result;
+	}
+
+
+	itp._saveToLS = function () {
+		localStorage.setItem ( "dataLS" , JSON.stringify(itp.data) );
+	//	console.log( localStorage.dataLS ); 
+
+		itp._saveToServer('http://keramet.kh.ua/itpSaveData.php');
+	}
+
+	
+	
 	itp.showCurent = function () {
 		var outputCurrent = "#outputCurrentState";
 
@@ -310,20 +334,8 @@ var itp = itp || {};
 														  "<b>itp.aSh.name:  \t </b>" + (itp.aSh? itp.aSh.name : itp.aSh) + "<br>" +
 													 	  "<b>itp.JSONdata:  \t </b>" + JSON.stringify( itp.JSONdata ) + "<br>";
 													 //	  "<b>localStorage.dataLS: </b>" + JSON.stringify( localStorage.dataLS ); 
-
 		console.dir( itp.aSh );
 		console.log( "itp.aSh (активный лист - АЛ): " + JSON.stringify(itp.aSh) );
-	}
-
-	
-	itp._saveToLS = function () {
-		localStorage.setItem ( "dataLS" , JSON.stringify(itp.data) );
-	//	console.log( localStorage.dataLS ); 
-
-	//	itp._saveToServer('http://keramet.kh.ua/itpSaveData.php',  function () {
-    //		alert("Данные отправлены на сервер!");
-	//	});
-
 	}
 
 		// может, лучше хранить ссылку на активный лист вместо функции определения АЛ ??
@@ -338,35 +350,10 @@ var itp = itp || {};
 
 	itp._keyup = function (e) {
 		var td = document.querySelector('td.selected:hover');
-
 	//	console.log(e.target.nodeName);
 	//	console.log(e.target);
 	//	console.log(e.currentTarget);
-
 		if (td) { console.log(td); }
-	}
-
-	itp.checkFormula = function (cell, sheetIndex) {
-		var txt = itp.data[sheetIndex].cells[cell],
-			output = document.querySelector("#outputCurrentState"),
-			result;
-
-		if (typeof txt === "undefined") return "-" ;	// возвращаю "-" для наглядности		
-		if (txt[0] === "=") { 
-			console.log( "формула" );
-			try 		  { result = new Function("return " + txt.substring(1))(); }
-			catch (error) {	
-				result = "<span class='error'>!</span>";
-				output.innerHTML = 	"<b>Ошибка в формуле: </b>" +
-						itp.data[sheetIndex].name + ", ячейка " + cell  + "<br>";
-				setTimeout(function () { output.innerHTML = ""; }, 2000);
-			}
-		} else 	{
-			result = txt; 
-		}
-
-		console.log(result);
-		return result;
 	}
 
 
@@ -405,24 +392,18 @@ var itp = itp || {};
 		httpRequest.send(); 
 	}
 
-	itp._saveToServer = function (path, callback) {
+	itp._saveToServer = function (url) {
    		var xhr = new XMLHttpRequest();
 
   		xhr.onreadystatechange = function () {
         	if (xhr.readyState === 4) {
-            	if (xhr.status === 200) {
-                	console.log(xhr.response);
-                	if (callback) { callback(); }
-           		}
+            	if (xhr.status === 200) { console.log(xhr.response); }
        		}
 		};
-		xhr.open( 'POST', path );
-	//	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.open( 'POST', url );
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr.send( "itpData=" + encodeURIComponent(JSON.stringify(itp.data)) ); 
 	}
-
-
-
 
 
 document.addEventListener("DOMContentLoaded", itp.init);
