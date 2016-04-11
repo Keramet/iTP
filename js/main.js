@@ -8,7 +8,8 @@ var itp = itp || {};
 		scrollSize: 16,		// px
 		cell: 		{ width: 100, height: 30 },	// px;
 		sheets: 	[ "Лист 1", "Лист 2", "Лист 3" ],
-		hideSheets: true
+		hideSheets: true,
+		colChars: 	{ start: "A", end: "Z" }
 	}
 
 
@@ -51,8 +52,10 @@ var itp = itp || {};
 
 		document.querySelector('#btnGetJSON').addEventListener("click", function () {
 			itp._getJSONData('http://keramet.kh.ua/itpGetJSON.php',  function () {
+				var output = document.querySelector("#outputCurrentState");
     			console.log( JSON.stringify(itp.JSONdata) );
-    		//	itp.showCurent();
+    			output.innerHTML = 	"<b>JSON from server: </b>  см. Консоль...";
+				setTimeout(function () { output.innerHTML = ""; }, 3000);
 			});
 		});
 	}		//	end of  itp.init
@@ -191,7 +194,7 @@ var itp = itp || {};
 
 					cell = itp._colName(c) + (r + 1);
 					tbodyGrid.rows[r].insertCell(c).innerHTML = itp.data[n].cells[cell] ? 
-						itp.checkFormula( cell, n ) : "";
+						itp._checkFormula( cell, n ) : "";
 				}
 			}
 		}		// end of  __fillSheet
@@ -210,7 +213,7 @@ var itp = itp || {};
 				e.target.className = "input";
 				input = document.createElement("input");
 				input.className = "inGrid";
-				input.value = itp.aSh.cells[cell]? itp.aSh.cells[cell] : "";
+				input.value = itp.aSh.cells[cell]? itp.aSh.cells[cell].text : "";
 			//	input.value = e.target.innerHTML;
 
 				input.onblur = function () {
@@ -218,9 +221,11 @@ var itp = itp || {};
 								(e.target.parentNode.rowIndex + 1);
 
 					this.parentNode.classList.remove("input");	//	можно так:	this.parentNode.class = "";
-				//	this.parentNode.innerHTML = this.value;
-					itp.aSh.cells[cell] = this.value;
-					this.parentNode.innerHTML = itp.checkFormula(cell, itp.aShIndex);
+					if (!itp.aSh.cells[cell])  itp.aSh.cells[cell] = {};
+					itp.aSh.cells[cell].text = this.value;
+					this.parentNode.innerHTML = itp._checkFormula(cell, itp.aShIndex);
+
+					itp.reFresh();
 					
 					itp._saveToLS();
 				};
@@ -297,23 +302,48 @@ var itp = itp || {};
 	}
 
 
-	itp.checkFormula = function (cell, sheetIndex) {
-		var txt = itp.data[sheetIndex].cells[cell],
-			output = document.querySelector("#outputCurrentState"),
-			result;
+	itp._checkFormula = function (cell, sheetIndex) {
+		var txt = itp.data[sheetIndex].cells[cell].text,
+			formula, result,
+			output = document.querySelector("#outputCurrentState");
 
 		if (typeof txt === "undefined") return "-" ;	// возвращаю "-" для наглядности		
-		if (txt[0] === "=") { 
-			try 		  { result = new Function("return " + txt.substring(1))(); }
+		if (txt[0] === "=") {
+			formula = txt.substring(1);
+			try 		  { result = new Function( "return " + __getValByRef(formula) )(); }
 			catch (error) {	
+			//	itp.data[sheetIndex].cells[cell].value = "!";
 				result = "<span class='error'>!</span>";
 				output.innerHTML = 	"<b>Ошибка в формуле: </b>" +
 						itp.data[sheetIndex].name + ", ячейка " + cell  + "<br>";
 				setTimeout(function () { output.innerHTML = ""; }, 2000);
+
 			}
 		} else 	{ result = txt; }
+		itp.data[sheetIndex].cells[cell].value = result;
 
 		return result;
+
+		function __getValByRef(formula) {
+			return  formula.replace( /([A-Z]+\d+)/g, function (ref) { 
+						return itp.aSh.cells[ref].value;
+					});
+		}
+
+	}		//  end of itp._checkFormula
+
+	itp.reFresh = function () {		//	reCalculation all cells in active sheet
+		var cell, r, c, temp,
+			tableGrid = document.querySelector("div.sheet.active").querySelector('.itpTable');
+
+		for (cell in itp.aSh.cells) {
+			temp = cell.search(/\d/);
+			r = cell.substring(temp) - 1;
+			c = itp._NfromColName( cell.substring(0, temp) ) - 1;
+			tableGrid.rows[r].cells[c].innerHTML = itp._checkFormula( cell, itp.aShIndex );
+		//	console.log("rows[" + r + "].cells[" + c + "]");
+		//	console.log(cell + ": " + itp.aSh.cells[cell].text);
+		}
 	}
 
 
@@ -358,11 +388,10 @@ var itp = itp || {};
 
 
 	itp._colName = function (n) {		
-		var startChar = "A",  endChar = "Z",
-			chCount = endChar.charCodeAt(0) - startChar.charCodeAt(0) + 1,
+		var chCount = itp._config.colChars.end.charCodeAt(0) - itp._config.colChars.start.charCodeAt(0) + 1,
 			arr = [];
 
-		function getChar(i) { return String.fromCharCode(startChar.charCodeAt(0) + i) }
+		function getChar(i) { return String.fromCharCode( itp._config.colChars.start.charCodeAt(0) + i ); }
 
 		(function decomposition(N, base) {		// подумать, может base убрать?? (использовать сразу chCount)
 			var temp = Math.floor(N / base);
@@ -376,6 +405,18 @@ var itp = itp || {};
 
 		return arr.join("");
 	}
+
+	itp._NfromColName = function (str) {		// добавить проверку символов на попадание в диапазон [startChar...endChar]
+		var startCode = itp._config.colChars.start.charCodeAt(0),
+			endCode = itp._config.colChars.end.charCodeAt(0),
+			count = endCode - startCode + 1,
+			strArr = str.split("").reverse();
+       
+		return strArr.reduce( function (pr, cur, i) {
+        	return pr + Math.pow(count, i) + cur.charCodeAt(0) - startCode;
+        }, 0);
+	}
+
 
 	itp._getJSONData = function (path, callback) {
    		var httpRequest = new XMLHttpRequest();
