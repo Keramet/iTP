@@ -12,19 +12,19 @@
 		<fieldset>
 			<legend>Таблица</legend>
 		
-			<label>Cтрок:
-				<input type="number" id="rCount"  min="1" required>
-			</label><br>
-			<label>Cтолбцов:
-				<input type="number" id=cCount min="1" required>
+			<label><b>r</b>: <input type="number" id="rCount"  min="1" required title="Количество строк (r) на листе">
+			</label>
+			<label><b>c</b>: <input type="number" id=cCount min="1" required title="Количество столбцов (c) на листе">
 			</label>
 			<br>
-			<i><label title="Переключение листов">Листы
+			<label><input type="number" id="shCount"  min="1" max="5" required title="Количество листов">
+			</label>
+			<label title="Переключение листов"> :<b> Л. </b>: 
 				<select name="sheetChange" >
-					<option value="reCreate">Пересоздавать</option>	
+					<option value="reCreate">переСоздавать</option>	
 					<option value="hide">Прятать</option>	
 				</select>
-			</label></i><br>
+			 </label><br>
 			<button id="btnCreate" autofocus>Создать</button>
 			<button id="btnRestore" title="Восстановить из localStorage">Восстановить</button>
 		</fieldset>
@@ -32,6 +32,7 @@
 			<legend>JSON</legend>
 			<button id="btnGetJSON">Получить JSON</button><br>
 			<div id="outputJSON"></div>	
+			<br>
 		</fieldset>
 		<fieldset>
 			<legend><i>Текущее состояние</i></legend>
@@ -42,9 +43,10 @@
 	</header>
 		
 	<main>
-		<div class="sheetsTab">
-			
-		</div>
+		<div class="formula">
+			<span>&fnof;<sub>x</sub></span><input class="formula"></input>
+		</div>	
+		<div class="sheetsTab"></div>
 
 		<div class="sheet" id="sh-0">
 			<div>
@@ -64,6 +66,7 @@
 				</div>
 			</div>
 		</div>	
+
 	</main>
 		
 		

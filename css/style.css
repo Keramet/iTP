@@ -15,7 +15,7 @@ header {
 	border-radius: 4px;
 	padding: 7px;
 	background: #AAD4B9;
-	min-height: 150px;
+	min-height: 130px;
 	clear: both;
 	height: auto;
 	overflow: all;
@@ -30,6 +30,34 @@ main {
 		border: none;
 	}	
 /*	main>div:nth-child(2) {	*/
+
+div.formula {
+	padding-top: 8px;
+}
+div.formula span {
+	font-size: 24px;
+	font-style: italic;
+	color: navy;
+	margin-left: 10px;
+}
+div.formula sub {
+	padding: 0px;
+	font-size: 18px;
+}
+div.formula input {
+	padding-left: 5px;
+	border-radius: 3px;
+	border: 1px solid blue;
+	background: #D8E6F3;
+	width: 80%;
+	font-weight: bolder;
+	color: navy;
+}
+	div.formula input:focus {
+	background: white;
+	color: blue;
+	}
+
 
 div.sheet {
 	margin: 0 10px 10px 10px;
@@ -59,8 +87,8 @@ div.sheet>div:last-child {
 	background: Lavender;	/*	#AAD4B9;  #B1B1B9;    подобрать цвет!    */
 	border: none;
 	text-align: right;
-	padding: 15px 5px 0 5px;	
-	margin: 10px 10px 0 10px;
+	padding: 5px 5px 0 5px;	
+	margin: 5px 10px 0 10px;
 }
 	.sheetsTab a {
 		vertical-align: text-bottom;
@@ -68,7 +96,7 @@ div.sheet>div:last-child {
 	.sheetsTab a span {
 		display: inline-block;
 		border-radius: 10px 10px 0 0;
-		width: 100px;
+		width: 80px;
 		margin-right: 5px;
 		text-align: center;
 		color: #6E718C;
@@ -84,7 +112,7 @@ div.sheet>div:last-child {
 	}
 	.sheetsTab a span.addSheet {
 		width: 50px;
-		margin-right: 100px;
+		margin-right: 60px;
 		background: #B1F6D0;
 		border: 1px solid #0B4124;
 		border-bottom: none;
@@ -134,9 +162,11 @@ main table {
 	position: relative;
 	padding: 0px;
 	background: white;
+	table-layout: fixed;		
 }
 div.table table {
 	color: navy;
+
 }
 
 th {
@@ -151,16 +181,21 @@ th {
 	width: 70px;
 /*	height: 18px;  */
 }
+	th.selected {
+		background: #96BAD9;
+		color: #181F8C;
+	}
 td {
-	width: 87px; 	
+	width: 88px; 	
 	height: 21px;
 	background: #D8E6F3;
 	overflow: hidden;
+	white-space: nowrap;
 	padding: 5px;
 }
 	td:hover, td.selected  {
 		cursor: text;
-		overflow: hidden;
+	/*	overflow: hidden;	*/
 	}	
 	td:hover  {
 		background: #B1F6D0;
@@ -177,7 +212,7 @@ td {
 	td.input {
 		padding: 0px;
 		margin: 0px;
-		overflow: hidden;
+		width: 98px;
 	}
 
 input.inGrid {
@@ -185,7 +220,7 @@ input.inGrid {
 	border: 1px solid navy;
 	margin: 0px;
 	height: 19px;
-	width: 85px;
+	width: 87px;
 }
 
 fieldset {
@@ -193,24 +228,28 @@ fieldset {
 	text-align: center;
 	vertical-align: top;
 	float: left;
-	width: 25%;
-
+	width: 30%;
+	min-width: 250px;
 }
-fieldset:last-child {
-	float: right;
-	border: 1px dotted gray;
-	width: 40%;
-	height: auto;
-	overflow: auto;
-	overflow-y: scroll;
-}
+	fieldset:last-child {
+		float: right;
+		border: 1px dotted gray;
+		width: 30%;
+		height: auto;
+		overflow: auto;
+		overflow-y: scroll;
+	}
 	#outputCurrentState {
 		text-align: left;
 		border:none;
 	}
+fieldset select {
+/*	width: 100px;	*/
+}
+
 
 input[type=number] {
-	width: 50px;
+	width: 40px;
 };
 label {
 	width: 150px;
