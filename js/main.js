@@ -18,6 +18,9 @@ var itp = itp || {};
 			cCountInput  = document.querySelector('#cCount'),
 			shCountInput = document.querySelector('#shCount'),
 			select 		 = document.querySelector('select');
+
+
+		itp.inputCell = document.querySelector('input.formula.cell');
 			
 		document.querySelector('select').selectedIndex = itp._config.hideSheets ? 1 : 0;
 			
@@ -141,6 +144,7 @@ var itp = itp || {};
 		 	}
 		});
 		
+		itp.inputCell.value = "";
 		e.target.classList.add("active");
 
 		if ( !itp._config.hideSheets ) {
@@ -300,7 +304,10 @@ var itp = itp || {};
 				cell =	itp._colName(e.target.cellIndex) +
 							(e.target.parentNode.rowIndex + 1);
 				formula.value = itp.aSh.cells[cell]? 	itp.aSh.cells[cell].text : "";		
-				//console.log(itp.aSh.cells[cell]? );			
+				//console.log(itp.aSh.cells[cell]? );	
+			//	console.dir(itp.inputCell);	
+				console.dir(itp.aShIndex);	
+				itp.inputCell.value = `[Лист ${itp.aShIndex+1}]${cell}`;	
 			}
 		}
 
@@ -421,14 +428,21 @@ var itp = itp || {};
 				[].forEach.call(range, function (el) {
 					el.classList.add("selected");
 				});
+
+				
 			}
 		}
 
 		function __unSelect() {
-			var selected = document.querySelectorAll("td.selected, th.selected");
+			let selected = document.querySelectorAll("td.selected, th.selected");
+		
+			[].forEach.call( selected, cell => cell.classList.remove("selected") );	
+		/*
 			[].forEach.call(selected, function (el) {
 				el.classList.remove("selected");
 			});
+		*/
+			itp.inputCell.value = "";
 		}
 
 
@@ -590,9 +604,108 @@ var itp = itp || {};
 		xhr.send( "itpData=" + encodeURIComponent(JSON.stringify(itp.data)) ); 
 	}
 
+class itpClass {
+	constructor (sheetCount=3) {
+		this._conf = {
+			rCount: 	20,
+			cCount: 	20,
+			scrollSize: 16,		// px
+			cell: 		{ width: 100, height: 30 },	// px;
+			sheetCount: 3,
+			sheets: 	[], //[ "Лист 1", "Лист 2", "Лист 3" ],	// убрать?
+			hideSheets: true,
+			colChars: 	{ start: "A", end: "Z" }
+		}
+
+		this.sheetCount = sheetCount || this._conf.sheetCount; 
+		console.log("-".repeat(5) + "constructor" +  "-".repeat(5));
+		console.dir(this);
+		console.log("-".repeat(10));
+		itpClass.init();
+	//	this.init();
+	}
+	static init () {	// пока тренеровочно
+	//	let itpAppInit = itpApp || {};
+		console.dir(this);
+		console.log("-".repeat(10));
+		console.log("4");
+		console.log(`${4*10}`);
+	//	console.log("itpApp: ");
+	//	console.log(itpApp);
+	//	console.dir(itpApp? itpApp : null);
+	}
+
+		/*
+		var rCountInput  = document.querySelector('#rCount'),
+			cCountInput  = document.querySelector('#cCount'),
+			shCountInput = document.querySelector('#shCount'),
+			select 		 = document.querySelector('select');
+			
+		document.querySelector('select').selectedIndex = itp._config.hideSheets ? 1 : 0;
+			
+		rCountInput.value = itp._config.rCount;
+		cCountInput.value = itp._config.cCount;
+		shCountInput.value = 3;	// itp._config.sheets.length;
+	
+	//	itp.data =  localStorage.dataLS? JSON.parse(localStorage.dataLS) : [];	// листы
+
+		document.querySelector('#btnCreate').addEventListener("click", function () {
+			var i;
+			itp.rCount  = +rCountInput.value;
+			itp.cCount  = +cCountInput.value;
+			itp.shCount = +shCountInput.value;
+
+			itp.data = [];
+			for (i = 0; i < itp.shCount; i++) {
+				itp._config.sheets.push("Лист " + (i+1));
+				itp.data[i] = { name: itp._config.sheets[i] };
+			}
+			console.log(itp._config.sheets);
+		//	itp._config.sheets.forEach( function (el, i) {
+		//		itp.data[i] = { name: el };	
+		//	});
+			itp.aShIndex = 0;	
+			itp.aSh = itp.data[ itp.aShIndex ];		
+			itp.aSh["active"] = true;
+			itp._config.hideSheets = document.querySelector('select').selectedIndex ? true : false ;
+
+			itp._createTabs();
+		});
+
+		document.querySelector('#btnRestore').addEventListener("click", function () {
+			itp.data 	 = JSON.parse( localStorage.dataLS );
+			itp.aShIndex = itp.activeSheet();
+			itp.aSh 	 = itp.data[ itp.aShIndex ];	
+			itp._config.hideSheets = document.querySelector('select').selectedIndex ? true : false ;
+
+			itp._createTabs();
+		});
+
+		document.querySelector('#btnGetJSON').addEventListener("click", function () {
+			itp._getJSONData('http://keramet.kh.ua/itpGetJSON.php',  function () {
+				var output = document.querySelector("#outputCurrentState");
+    			console.log( JSON.stringify(itp.JSONdata) );
+    			output.innerHTML = 	"<b>JSON from server: </b>  см. Консоль...";
+				setTimeout(function () { output.innerHTML = ""; }, 3000);
+			});
+		});
+		*/
+
+}	// end of itpClass
+
+console.log("1");
+const itpApp = new itpClass (4);
+console.log("itpApp: ");
+console.log(itpApp);
+
+console.log("2");
+
 
 document.addEventListener("DOMContentLoaded", itp.init);
 
+document.addEventListener("DOMContentLoaded", itpClass.init);
+
+console.log("3");
 
 
 

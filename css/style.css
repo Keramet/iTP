@@ -20,6 +20,10 @@ header {
 	height: auto;
 	overflow: all;
 }
+	header>button{
+		margin-top: 20px;
+		display: inline-block;
+	}	
 
 main {
 /*	display: none;	*/		
@@ -35,11 +39,18 @@ div.formula {
 	padding-top: 8px;
 }
 div.formula span {
-	font-size: 24px;
+	font-size: 20px;
 	font-style: italic;
-	color: navy;
-	margin-left: 10px;
+	color: Silver;
+	margin-left: 5px;
+	padding: 5px;
 }
+	div.formula span.formula {
+		font-size: 24px;
+		margin-left: 10px;
+		color: navy;	
+	}
+
 div.formula sub {
 	padding: 0px;
 	font-size: 18px;
@@ -49,13 +60,18 @@ div.formula input {
 	border-radius: 3px;
 	border: 1px solid blue;
 	background: #D8E6F3;
-	width: 80%;
+	width: 60%;
 	font-weight: bolder;
+	font-size: 16px;
+	font-family: "Courier New",Courier, monospace, "Comic Sans MS", Tahoma, Verdana;
 	color: navy;
 }
 	div.formula input:focus {
 	background: white;
 	color: blue;
+	}
+	input.formula.cell {
+		width: 20%;
 	}
 
 
@@ -233,11 +249,15 @@ fieldset {
 }
 	fieldset:last-child {
 		float: right;
-		border: 1px dotted gray;
+	/*	text-align: right;
+			
+		border: 1px dotted gray;		*/
 		width: 30%;
-		height: auto;
+	/*	height: auto;
+		
 		overflow: auto;
 		overflow-y: scroll;
+	*/
 	}
 	#outputCurrentState {
 		text-align: left;
