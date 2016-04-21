@@ -10,4 +10,13 @@
 
 		echo 'Данные сохранены на сервере';
 	}
+
+	if ( isset($_POST['itpAppData']) ) {
+
+		$f = fopen("itpData.txt", "w");
+		fwrite($f, $_POST['itpAppData']);
+		fclose($f);
+
+		echo 'Данные сохранены на сервере!';
+	}
 ?>
