@@ -19,8 +19,8 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 		this.isNeedSave 	= false;
 		this.dataJSON 		= null;
 		this.isFormulaMode 	= false;
-		this.aSh   			= null;
-		this.aCell 			= null;
+		this.aSh   			= null;			//	активный лист
+		this.aCell 			= null;			//	активная ячейка
 		this.hideSheets 	= this._conf.hideSheets;
 	}
 
@@ -53,7 +53,7 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 				itpApp.data.push(sh);
 			}
 
-			itpApp.hideSheets = document.querySelector('select').selectedIndex ? true : false;	//	попробовать select вместо document.querySelector('select')
+			itpApp.hideSheets = select.selectedIndex ? true : false;
 			itpApp.aSh   = itpApp.data[0];
 			itpApp.aSh["active"] = true;
 			
@@ -125,7 +125,7 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 				sheetsTab.appendChild(tab);
 
 				if (itpApp.hideSheets) {	
-					if (i) {		// создаём дивы для листов (при скрытии) - переместить в createSheets
+					if (i) {		// создаём дивы для листов (при скрытии) - переместить в createSheets ?
 						sheet = document.createElement("div");
 						sheet.className = 'sheet';
 						sheet.id = "sh-" + i;
@@ -133,7 +133,6 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 						main.appendChild(sheet);
 					}
 					itpApp.createSheets(i);
-				//	itp._createSheets(i);	// заменить на itpApp.createSheets(i)!!!
 					if (el.active) { document.getElementById('sh-' + i).classList.add("active"); }
 				}
 			});	
@@ -141,7 +140,6 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 			if ( !itpApp.hideSheets ) {
 				document.getElementById('sh-0').classList.add("active");
 				itpApp.createSheets();
-			//	itp._createSheets();		// заменить на itpApp.createSheets()!!!
 			}
 
 			function _clickSheetTab (e) {
@@ -167,8 +165,8 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 		
 				e.target.classList.add("active");
 
-				if ( !itpApp._conf.hideSheets ) {
-					clearSheet();
+				if ( !itpApp.hideSheets ) {
+					_clearSheet();
 				 	itpApp.createSheets();
 				}
 
@@ -179,13 +177,13 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 				return false;
 			}
 
-			function clearSheet () {			// используем, когда пересоздаём листы
+			function _clearSheet () {			// используем, когда пересоздаём листы
 				let sheet = document.querySelector("div.sheet.active"),
 					tableGrid = sheet.querySelector('.itpTable');
 
 				sheet.querySelector('.itpTableCol').innerHTML = "";
 				sheet.querySelector('.itpTableRow').innerHTML = "",
-				tableGrid.getElementsByTagName('tbody')[0].innerHTML = "";
+				tableGrid.querySelector('tbody').innerHTML 	  = "";
 			}
 
 		}// end of  createSheetTab()
@@ -197,12 +195,12 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 			tableCol  = sheet.querySelector('.itpTableCol'),
 			tableRow  = sheet.querySelector('.itpTableRow'),
 			tableGrid = sheet.querySelector('.itpTable'),
-			tbodyGrid = tableGrid.getElementsByTagName('tbody')[0],
-			selMode = false, selRange = {};
+			tbodyGrid = tableGrid.querySelector('tbody'), 		// tableGrid.getElementsByTagName('tbody')[0],
+			selMode = false, selRange = {};		// для выделения диапазона ячеек
 		//	tbodyGrid = document.createElement("tbody");	// подумать, как лучше...
 
 		if ( !tableCol.rows.length ) {		// были ли для этого дива созданы таблицы 
-			itpApp._conf.hideSheets ? _fillSheet(sheetIndex) : _fillSheet( +itp.aSh.id - 1 );
+			itpApp.hideSheets ? _fillSheet(sheetIndex) : _fillSheet( +itpApp.aSh.id - 1 );
 
 			tableGrid.onclick 	 	= _clickGrid;
 			tableGrid.ondblclick 	= _dblclickGrid;
@@ -234,7 +232,7 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 
 				for (let c = 0; c < itpSh.cCount; c++) {
 					if (r === 0) { 
-						if (c === 0 ) { tableCol.insertRow(0) };
+						if (c === 0 )  tableCol.insertRow(0);
 						tableCol.rows[0].insertCell(c).outerHTML = "<th>" +  itpCellClass.getColName(c) + "</th>";
 					}
 
@@ -291,8 +289,8 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 				input.value = itpApp.aSh.cells[cellName]? itpApp.aSh.cells[cellName].text : "";	//	может, использовать itpApp.aCell?
 
 				input.onblur  = __inputBlur;
-				input.onkeyup = function (e) { if (e.keyCode === 13) this.blur(); };
-				input.oninput = function (e) { formula.value = this.value; };
+				input.onkeyup = function (e) { if (e.keyCode === 13) this.blur(); }
+				input.oninput = function (e) { formula.value = this.value; }
 	
 				e.target.innerHTML = "";
 				e.target.appendChild(input);
@@ -517,20 +515,20 @@ class itpClass {	// всё приложение.  Объект:  itpApp.
 
 class itpSheetClass {
 
-	constructor (rCount=30, cCount=20, isHide=true) {	//	false, чтобы переСоздавать листы в одном диве
+	constructor (rCount=30, cCount=20, isHide=true) {	//	false, чтобы переСоздавать лист (пока не использую) 
 		this.id 	= -1;		// только создан. потом id >= 0
 		this.name 	= "";
 		this.rCount = rCount;
 		this.cCount = cCount;
-		this.cells 	= {};
+		this.cells 	= {};		// может, использовать спец.объект? (или массив?)
 	}
 
-	fromJSON (sheetJSON=null) {
+	fromJSON (sheetJSON) {		// может, как-то совместить с constructor ?
 		if ( !sheetJSON ) return	console.log("Не передан sheetJSON!");
 
 	//	( {this.id, this.name, this.rCount, this.cCount, this.cells} = sheetJSON );
-		let {id, name, rCount, cCount, cells, active} = sheetJSON;
-
+		let {id, name, rCount, cCount, cells, active=false} = sheetJSON;
+		
 		this.id 	= id;		
 		this.name 	= name;
 		this.rCount = rCount;
@@ -539,14 +537,14 @@ class itpSheetClass {
 			let itpCell = new itpCellClass().fromJSON( cells[cell] );
     		this.cells[itpCell.name] = itpCell;
 		}
-		this.active	= active || false;
+		this.active	= active;
 
 		return this;
 	}
 	addCell (cellName, text="") {
 		if ( !cellName )  return console.log('Не указана ячейка (например: "D4")');
 
-		if ( this.cells[cellName] ) {	//	если text="" ? удалять или нет ?
+		if ( this.cells[cellName] ) {	//	если text="" удалять? или value=0 ?
 			this.cells[cellName].text = text;
 			this.cells[cellName].getValue();
 			return this.cells[cellName];
@@ -569,7 +567,8 @@ class itpSheetClass {
 
 
 class itpCellClass {
-	constructor () {
+
+	constructor () {		// подумать, какие параметры можно передавать...
 		this.sheetId = -1;
 		this.name 	 = "";
 		this.id 	 = `[${this.sheetId}]${this.name}`;
@@ -577,11 +576,10 @@ class itpCellClass {
 		this.value 	 = "";
 	}
 
-	fromJSON (cellJSON=null) {
+	fromJSON (cellJSON) {
 		if ( !cellJSON ) return	console.log("Не передан cellJSON!");
 
 		let {sheetId, name, id, text, value} = cellJSON;
-
 		this.sheetId = sheetId;
 		this.name 	 = name;
 		this.id 	 = id;
@@ -595,10 +593,7 @@ class itpCellClass {
 			sheet = +this.sheetId - 1,	//	для  _getValueByRef(formula)
 			output = document.querySelector("#outputCurrentState");
 
-		if (this.text === "") {
-			this.value = "";
-			return 0;
-		}
+		if (this.text === "") return 0, this.value = "";
 
 		if (this.text[0] === "=") {
 			formula = this.text.substring(1);
@@ -631,9 +626,9 @@ class itpCellClass {
 	getColumn () { return this.name.substring( 0, this.name.search(/\d/) ); }
 
 	getColumnN () {		//	получить номер столбца (отсчёт от 1)
-		let startCode = itpApp._conf.colChars.start.charCodeAt(0),
-			endCode = itpApp._conf.colChars.end.charCodeAt(0),
-			count = endCode - startCode + 1,
+		let startCode  = itpApp._conf.colChars.start.charCodeAt(0),
+			endCode    = itpApp._conf.colChars.end.charCodeAt(0),
+			count 	   = endCode - startCode + 1,
 			colNameArr = this.getColumn().split("").reverse();
 
 		return colNameArr.reduce( (pr, cur, i) => {
@@ -646,10 +641,10 @@ class itpCellClass {
 	static getColName (n=0) {		
 		let chCount = itpApp._conf.colChars.end.charCodeAt(0) - itpApp._conf.colChars.start.charCodeAt(0) + 1,
 			arr = [],
-			getChar = (i) => String.fromCharCode( itpApp._conf.colChars.start.charCodeAt(0) + i );
+			getChar = (i) => String.fromCharCode( itpApp._conf.colChars.start.charCodeAt(0) + i );	// а если i>chCount ?  (i присвоить itpApp._conf.colChars.end?)
 
 		(function decomposition(N, base) {		// подумать, может base убрать?? (использовать сразу chCount)
-			var temp = Math.floor(N / base);
+			let temp = Math.floor(N / base);
 
 			if (!temp) { arr.unshift( getChar(N) ); }
 			else {
