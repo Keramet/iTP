@@ -6,8 +6,8 @@ body {
 	background: Lavender;		
 }
 div {
-	border: 1px solid blue;
-	padding: 0px;
+	border: 1px solid blue;	
+	padding: 0px;		
 }
 
 header {
@@ -209,11 +209,11 @@ td {
 	white-space: nowrap;
 	padding: 5px;
 }
-	td:hover, td.selected  {
+	td:hover, td.selected, td.hovered  {
 		cursor: text;
 	/*	overflow: hidden;	*/
 	}	
-	td:hover  {
+	td:hover, td.hovered  {
 		background: #B1F6D0;
 		color: #0B4124;
 	}
