@@ -15,7 +15,7 @@ header {
 	border-radius: 4px;
 	padding: 7px;
 	background: #AAD4B9;
-	min-height: 130px;
+	min-height: 100px;
 	clear: both;
 	height: auto;
 	overflow: all;
@@ -166,7 +166,7 @@ div.colHeader, div.table {
 	width: auto;	
 }
 div.rowHeader, div.table {
-	height: 360px;
+	height: 400px;
 }
 
 /* .table table, .colHeader table, .rowHeader table {	*/

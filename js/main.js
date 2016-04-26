@@ -19,7 +19,6 @@ class itpClass {	//   Объект:  itpApp.
 		this.isNeedSave 	= false;
 		this.dataJSON 		= null;
 		this.formula 		= new formulaClass();
-	//	this.isFormulaMode 	= false;
 		this.aSh   			= null;			//	активный лист
 		this.aCell 			= null;			//	активная ячейка
 		this.hideSheets 	= this._conf.hideSheets;
@@ -256,33 +255,36 @@ class itpClass {	//   Объект:  itpApp.
 
 
 		function _clickGrid (e) {
-			let cellName, aCell,
-				inputCell = document.querySelector("#inputCell");	// может, добавить как св-во к aCell (itpApp.aCell.input) или как itpApp.inputCell ?
+			let cellName, aCell;
+			//	inputCell = document.querySelector("#inputCell");	// может, добавить как св-во к aCell (itpApp.aCell.input) или как itpApp.inputCell ?
 
 			if (e.target.nodeName === "TD")  {
 				_unSelect();
-
-				e.target.classList.add("selected");
-
 				cellName =	itpCellClass.getColName( e.target.cellIndex ) + (e.target.parentNode.rowIndex + 1);
 
-				if (itpApp.aSh.cells[cellName]) {
-					aCell = itpApp.aSh.cells[cellName];
+				if ( itpApp.formula.active ) {
+					itpApp.formula.input.value += cellName;
+					itpApp.formula.text = itpApp.formula.input.value;
+					itpApp.formula.input.focus();
+					return;
 				} else {
-					aCell 		  = new itpCellClass();
-					aCell.sheetId = itpApp.aSh.id;
-					aCell.name 	  = cellName;
-					aCell.id      = `[${aCell.sheetId}]${aCell.name}`;
+					e.target.classList.add("selected");
+					if (itpApp.aSh.cells[cellName]) {
+						aCell = itpApp.aSh.cells[cellName];
+					} else {
+						aCell 		  = new itpCellClass();
+						aCell.sheetId = itpApp.aSh.id;
+						aCell.name 	  = cellName;
+						aCell.id      = `[${aCell.sheetId}]${aCell.name}`;
+					}
+
+					itpApp.aCell = aCell;
+					itpApp.aCell.setTD();
+					itpApp.formula.input.value = itpApp.aCell.text;		
+					itpApp.formula.inputCell.value = itpApp.aCell.id;
+				//	itpApp.formula.range.value = itpApp.aCell.id;
 				}
-
-				itpApp.aCell = aCell;
-				itpApp.aCell.setTD();
-				itpApp.formula.input.value = itpApp.aCell.text;		
-				inputCell.value = itpApp.aCell.id;
-			//	itpApp.formula.range.value = itpApp.aCell.id;
-				
 			}
-
 			
 		}// end of  _clickGrid()
 
@@ -308,6 +310,15 @@ class itpClass {	//   Объект:  itpApp.
 			}
 
 			function __inputBlur () {
+				console.dir(itpApp.formula.active);
+				if ( itpApp.formula.active ) {
+					this.value += cellName;
+					itpApp.formula.input.value += cellName;
+					itpApp.formula.text = itpApp.formula.input.value;
+					this.focus();
+					return;
+				}
+
 				this.parentNode.classList.remove("input");
 				itpApp.aCell = itpApp.aSh.addCell(cellName, this.value);
 				this.parentNode.innerHTML = itpApp.aCell.value;
@@ -342,10 +353,11 @@ class itpClass {	//   Объект:  itpApp.
 		}
 
 		function _tgMouseup (e) {
-			if (e.target.nodeName === "TD" && itpApp.sr) {
+		//	if (e.target.nodeName === "TD" && itpApp.sr) {
+			if (itpApp.sr && itpApp.sr.inProcess && (e.target.nodeName === "TD" || e.target.nodeName === "TABLE")) {
 				itpApp.sr.checkStartEnd().setClass("selected");
 				itpApp.sr.inProcess = false;
-			}
+			} 
 
 		}
 
@@ -573,7 +585,7 @@ class itpCellClass {
 		if (this.text[0] === "=") {
 			formula = this.text.substring(1);
 			try   {
-				result = new Function( "return " + _getValueByRef(formula) )(); 
+				result = new Function( "with (Math) { return " + _getValueByRef(formula) + "}" )(); 
 			}
 			catch (error) {	
 				result = "<span class='error'>!</span>";
@@ -644,7 +656,7 @@ class selRangeClass {
 	constructor (startR=-1, startC=-1, sheet=-1) {
 		this.start     = { r: startR,  c: startC };
 		this.end       = { r: startR,  c: startC };
-		this.sheet 	   = sheet;
+		this.sheet     = sheet;
 		this.inProcess = true;
 		this.getSelector();
 	//	console.log(this);
@@ -652,7 +664,6 @@ class selRangeClass {
 
 	checkEnd (endR, endC) {
 		let cp;
-
 		if (this.end.r !== endR || this.end.c !== endC) {
 			cp = this.copy().setClass("hovered", "remove");
 
@@ -660,24 +671,14 @@ class selRangeClass {
 			if (this.end.c !== endC) this.end.c = endC;
 			cp = this.copy().setClass("hovered");
 
-			inputCell.value = cp.toString();
+			itpApp.formula.inputCell.value = cp.toString();
 		}
 	}
 
 	checkStartEnd () {	// если  выделение начато не из верх.лев. угла
-		let temp;
-		if (this.start.r > this.end.r) {
-			temp 		 = this.start.r;
-		    this.start.r = this.end.r;
-			this.end.r   = temp;
-		}
-		if (this.start.c > this.end.c) {
-			temp 		 = this.start.c;
-		    this.start.c = this.end.c;
-			this.end.c   = temp;
-		}
+		if (this.start.r > this.end.r)  [this.start.r,  this.end.r] = [this.end.r, this.start.r];
+		if (this.start.c > this.end.c) 	[this.start.c,  this.end.c] = [this.end.c, this.start.c];
 		this.getSelector();
-	//	console.log( this.toString() );
 		return this;
 	}
 
@@ -713,24 +714,45 @@ class formulaClass {
 
 	constructor (selector='input.formula') {
 		this.input = document.querySelector(selector);		//  this.input = document.querySelector(selector) || 
+		
 		this.input.oninput = () => {
-			this.text = this.input.value;
+			this.checkActive();
 			itpApp.aCell.td.innerHTML = this.text;
 		}
-		this.input.onkeyup = function (e) { if (e.keyCode === 13) this.blur(); }
-		this.input.onfocus = () => { if ( !itpApp.aCell ) console.log("this.input.onfocus()...  Нет активной ячейки!"); }
+		this.input.onchange = () => {
+			this.checkActive();
+			console.log("onchange");
+		}
+		this.input.onkeyup = function (e) { 
+			if (e.keyCode === 13) {
+				itpApp.formula.active = false;
+				this.blur();
+				itpApp.aCell.td.classList.add("selected");
+			}
+		}
+		this.input.onfocus = () => {
+			if ( !itpApp.aCell ) console.log("this.input.onfocus()...  Нет активной ячейки!");
+			this.checkActive();
+			itpApp.aCell.td.innerHTML = this.text;
+		}
 		this.input.onblur  = () => { 
-			if ( itpApp.aCell ) {
+			if ( itpApp.aCell && !this.active ) {
 				itpApp.aCell.text = this.input.value;
 				this.text         = this.input.value;
 				itpApp.aSh.addCell( itpApp.aCell.name, itpApp.aCell.text );
 				itpApp.aCell.td.innerHTML = itpApp.aCell.getValue();
 				itpApp.isNeedSave = true;
 	    	} else console.log("this.input.onblur()...   Нет активной ячейки!");
+	    //	this.active = false;
 		}
-		this.text  = "";
-		this.range = document.querySelector("#inputCell").value;
-	//	this.setValue();
+		this.inputCell = document.querySelector("#inputCell");
+		this.active = false;
+		this.text   = "";
+	}// end of condtructor
+
+	checkActive () {
+		this.text   = this.input.value;
+		this.active = ( this.text.search(/[=+-/\*(]$/ig) !== -1 )? true : false;
 	}
 
 /*	setValue (options=null) {
