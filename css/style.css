@@ -148,7 +148,7 @@ div.rowHeader {
 	overflow-x: scroll;
 	overflow-y: hidden;
 }
-div.table {
+div.tableDiv {
 	overflow: scroll;
 }
 
@@ -161,15 +161,15 @@ div.empty, div.rowHeader {
 	width: 70px;
 	border-right: none;
 }
-div.colHeader, div.table {
+div.colHeader, div.tableDiv {
 	margin-left: 70px;
 	width: auto;	
 }
-div.rowHeader, div.table {
+div.rowHeader, div.tableDiv {
 	height: 400px;
 }
 
-/* .table table, .colHeader table, .rowHeader table {	*/
+/* .tableDiv table, .colHeader table, .rowHeader table {	*/
 main table {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 13px;
@@ -180,7 +180,7 @@ main table {
 	background: white;
 	table-layout: fixed;		
 }
-div.table table {
+div.tableDiv table {
 	color: navy;
 
 }
@@ -269,7 +269,7 @@ fieldset select {
 
 
 input[type=number] {
-	width: 40px;
+	width: 50px;
 };
 label {
 	width: 150px;
@@ -281,6 +281,6 @@ label {
 }
 span.error {
 	color: red;
-	font-weight:bold;
+	font-weight: bold;
 }
 

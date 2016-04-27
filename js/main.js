@@ -18,7 +18,7 @@ class itpClass {	//   Объект:  itpApp.
 		this.nextSheetId 	= 0;
 		this.isNeedSave 	= false;
 		this.dataJSON 		= null;
-		this.formula 		= new formulaClass();
+		this.formula 		= new FormulaClass();
 		this.aSh   			= null;			//	активный лист
 		this.aCell 			= null;			//	активная ячейка
 		this.hideSheets 	= this._conf.hideSheets;
@@ -132,13 +132,18 @@ class itpClass {	//   Объект:  itpApp.
 						main.appendChild(sheet);
 					}
 					itpApp.createSheets(i);
-					if (el.active) { document.getElementById('sh-' + i).classList.add("active"); }
+					if (el.active) { 
+						document.getElementById('sh-' + i).classList.add("active");
+						itpApp.reFresh();
+					}
+
 				}
 			});	
 
 			if ( !itpApp.hideSheets ) {
 				document.getElementById('sh-0').classList.add("active");
 				itpApp.createSheets();
+				itpApp.reFresh();
 			}
 
 			function _clickSheetTab (e) {
@@ -159,6 +164,7 @@ class itpClass {	//   Объект:  itpApp.
 		 				itpApp.data[i].active = true;
 		 				itpApp.aSh.active = false;
 		 				itpApp.aSh = itpApp.data[i];
+		 				itpApp.reFresh();
 		 			}
 				});
 		
@@ -167,6 +173,7 @@ class itpClass {	//   Объект:  itpApp.
 				if ( !itpApp.hideSheets ) {
 					_clearSheet();
 				 	itpApp.createSheets();
+				 	itpApp.reFresh();
 				}
 
 				itpApp.saveData();
@@ -214,7 +221,7 @@ class itpClass {	//   Объект:  itpApp.
 					itpApp.sr.checkEnd(endR, endC);
 				}
 			}	
-			sheet.querySelector('div.table').onscroll = _gridScroll;
+			sheet.querySelector('div.tableDiv').onscroll = _gridScroll;
 
 			tableCol.onclick = _clickTH; 
 			tableRow.onclick = _clickTH; 
@@ -224,7 +231,9 @@ class itpClass {	//   Объект:  itpApp.
 
 		function _fillSheet(n) {	//	создание структуры листа и заполнение данными
 			console.time("_fillSheet(" + n + ")... ");
-			let cell, itpSh = itpApp.data[n];
+			let row   = document.createElement("tr"),
+				cell  = document.createElement("td"),
+				itpSh = itpApp.data[n];
 
 			if ( !itpSh ) return console.log(`Нет данных листа [${n}]`);
 
@@ -233,8 +242,22 @@ class itpClass {	//   Объект:  itpApp.
 			tableCol.width 	 = tableGrid.width;
 			tableRow.height  = tableGrid.height;
 		
-			// может, лучше создать строку, добавлять строку сразу, чем по отдельным td?
+		
+			tableCol.insertRow(0);
+			for (let c = 0, cCount = itpSh.cCount; c < cCount; c++) {
+				row.appendChild( cell.cloneNode(false) );
+				tableCol.rows[0].insertCell(c).outerHTML = "<th>" +  itpCellClass.getColName(c) + "</th>";
+			}
 			for (let r = 0, rCount = itpSh.rCount; r < rCount; r++) {
+				tbodyGrid.appendChild( row.cloneNode(true) );
+				tableRow.insertRow(r).insertCell(0).outerHTML = "<th>" + (r + 1) + "</th>";
+			}
+
+		//	__reFresh(n);
+
+
+			// может, лучше создать строку, добавлять строку сразу, чем по отдельным td?
+		/*	for (let r = 0, rCount = itpSh.rCount; r < rCount; r++) {
 				tbodyGrid.insertRow(r);
 				tableRow.insertRow(r).insertCell(0).outerHTML = "<th>" + (r + 1) + "</th>";
 
@@ -248,11 +271,28 @@ class itpClass {	//   Объект:  itpApp.
 						itpSh.cells[cell] ? itpSh.cells[cell].value : "";
 				}
 			}
+		*/
+
+
 			tableGrid.appendChild(tbodyGrid);	// если	tbody создаём динамически (tbodyGrid = document.createElement("tbody");)
 	
 			console.timeEnd("_fillSheet(" + n + ")... ");
 		}// end of  _fillSheet()
 
+
+	/*
+		function __reFresh (sheetId) {		//	Написать реализацию!!  (Calculation all cells in active sheet)
+			let cell, iCell, iSh;
+
+			iSh = sheetId ? itpApp.data[sheetId - 1] : itpApp.aSh;
+			console.dir( iSh );
+
+			for (cell in iSh.cells) {
+				iCell = iSh.cells[cell];
+				iCell.setTD( iCell.getValue() );
+			}
+		}
+	*/
 
 		function _clickGrid (e) {
 			let cellName, aCell;
@@ -279,7 +319,7 @@ class itpClass {	//   Объект:  itpApp.
 					}
 
 					itpApp.aCell = aCell;
-					itpApp.aCell.setTD();
+				//	itpApp.aCell.setTD();
 					itpApp.formula.input.value = itpApp.aCell.text;		
 					itpApp.formula.inputCell.value = itpApp.aCell.id;
 				//	itpApp.formula.range.value = itpApp.aCell.id;
@@ -322,30 +362,19 @@ class itpClass {	//   Объект:  itpApp.
 				this.parentNode.classList.remove("input");
 				itpApp.aCell = itpApp.aSh.addCell(cellName, this.value);
 				this.parentNode.innerHTML = itpApp.aCell.value;
-				__reFresh();
+			//	__reFresh();
+				itpApp.reFresh();
 				itpApp.isNeedSave = true;
 			}
 
-			function __reFresh () {		//	Написать реализацию!!  (Calculation all cells in active sheet)
-			/*	let cell, r, c,
-					tableGrid = document.querySelector("div.sheet.active").querySelector('.itpTable');
-
-				for (cell in itpApp.aSh.cells) {
-					console.dir(cell);
-					
-					c = cell.getColumnN() - 1;
-					r = cell.getRow() - 1;
-					tableGrid.rows[r].cells[c].innerHTML = cell.getValue();
-				}
-			*/
-			}
+			
 		}// end of  _dblclickGrid()
 
 
 		function _tgMousedown (e) {
 			if (e.target.nodeName === "TD") {
 				_unSelect();
-				itpApp.sr = new selRangeClass( e.target.parentNode.rowIndex + 1,
+				itpApp.sr = new SelRangeClass( e.target.parentNode.rowIndex + 1,
 								 		e.target.cellIndex + 1,
 								 		itpApp.aSh.id);;
 
@@ -443,6 +472,18 @@ class itpClass {	//   Объект:  itpApp.
 
 	}// end of  createSheets
 
+	reFresh (sheetId) {		//	Calculation all cells in active sheet
+		let cell, iCell, iSh;
+
+	//	iSh = sheetId ? itpApp.data[sheetId - 1] : itpApp.aSh;
+		iSh = itpApp.aSh;
+
+		for (cell in iSh.cells) {
+			iCell = iSh.cells[cell];
+			iCell.setTD( iCell.getValue() );
+		}
+	}
+
 	saveData (onLS=true, onServer=true) {
 		let xhr, url = "http://keramet.kh.ua/itpSaveData.php";
 
@@ -506,15 +547,13 @@ class itpSheetClass {
 		this.name 	= "";
 		this.rCount = rCount;
 		this.cCount = cCount;
-		this.cells 	= {};		// может, использовать спец.объект? (или массив?)
+		this.cells 	= {};		// может, использовать спец.объект (WeakSet)? (или массив?)
 	}
 
 	fromJSON (sheetJSON) {		// может, как-то совместить с constructor ?
-		if ( !sheetJSON ) return	console.log("Не передан sheetJSON!");
+		if ( !sheetJSON ) return  console.log("Не передан sheetJSON!");
 
-	//	( {this.id, this.name, this.rCount, this.cCount, this.cells} = sheetJSON );
 		let {id, name, rCount, cCount, cells, active=false} = sheetJSON;
-		
 		this.id 	= id;		
 		this.name 	= name;
 		this.rCount = rCount;
@@ -525,7 +564,7 @@ class itpSheetClass {
 		}
 		this.active	= active;
 
-		return this;
+		return this;itpSheetClass
 	}
 	addCell (cellName, text="") {
 		if ( !cellName )  return console.log('Не указана ячейка (например: "D4")');
@@ -557,10 +596,10 @@ class itpCellClass {
 	constructor () {		// подумать, какие параметры можно передавать...
 		this.sheetId = -1;
 		this.name 	 = "";
-		this.id 	 = `[${this.sheetId}]${this.name}`;
+		this.id 	 = `[${this.sheetId}]${this.name}`;	// может, заменить на getter?
 		this.text 	 = "";
 		this.value 	 = ""
-		this.td 	 = null;
+	//	this.td 	 = null;
 	}
 
 	fromJSON (cellJSON) {
@@ -572,7 +611,7 @@ class itpCellClass {
 		this.id 	 = id;
 		this.text 	 = text;
 		this.value   = value;
-		return this;	//	this - ячейка
+		return this;
 	}
 
 	getValue () {
@@ -596,7 +635,7 @@ class itpCellClass {
 		} else { result = this.text; }
 		return this.value = result;
 
-		function _getValueByRef(formula) {		// sheet надо брать из formula. Добавить проверку, попадает ли ref на лист. 
+		function _getValueByRef(formula) {		// sheet надо брать из formula!! (чтоб ссылаться на другие листы)  Добавить проверку, попадает ли ref на лист?
 			return  formula.replace( /([A-Z]+\d+)/g, ref => {
 				let val = itpApp.data[sheet].cells[ref]? itpApp.data[sheet].cells[ref].value
 													   : 0;
@@ -606,8 +645,9 @@ class itpCellClass {
 	}	//	end of  getValue()
 
 	getColumn () { return this.name.substring( 0, this.name.search(/\d/) ); }
+	get column () { return  this.name.substring( 0, this.name.search(/\d/) ); }
 
-	getColumnN () {		//	получить номер столбца (отсчёт от 1)
+	getColumnN () {		//	получить номер столбца. Отсчёт с 1    //  get columnN () { ... }
 		let startCode  = itpApp._conf.colChars.start.charCodeAt(0),
 			endCode    = itpApp._conf.colChars.end.charCodeAt(0),
 			count 	   = endCode - startCode + 1,
@@ -618,16 +658,16 @@ class itpCellClass {
         }, 0);
 	}
 
-	getRow () { return this.name.substring( this.name.search(/\d/) ); }
+//	getRow () { return this.name.substring( this.name.search(/\d/) ); }
+	get row () { return  +this.name.substring( this.name.search(/\d/) ); }
 
-	setTD (text="") {	//	связь с конкретной ячейкой в HTML-таблице
+	setTD (txt=this.value) {	//	связь с конкретной ячейкой в HTML-таблице
 		let table = document.querySelector("div.sheet.active").querySelector("table.itpTable"),
-			r 	  = this.getRow() - 1,
+			r 	  = this.row - 1,
 			c 	  = this.getColumnN() - 1;
 
-		this.td = table.rows[r].cells[c];
-	//	this.td.innerHTML = text;
-		return this.td;
+		table.rows[r].cells[c].innerHTML = txt;
+	//	return this.td;
 	}
 
 	static getColName (n=0) {		
@@ -651,7 +691,7 @@ class itpCellClass {
 }//	end of  itpCellClass
 
 
-class selRangeClass {
+class SelRangeClass {
 
 	constructor (startR=-1, startC=-1, sheet=-1) {
 		this.start     = { r: startR,  c: startC };
@@ -662,7 +702,7 @@ class selRangeClass {
 	//	console.log(this);
 	}
 
-	checkEnd (endR, endC) {
+	checkEnd (endR, endC) {		//	проверяем, изменился ли диапазон в процессе выделения
 		let cp;
 		if (this.end.r !== endR || this.end.c !== endC) {
 			cp = this.copy().setClass("hovered", "remove");
@@ -694,7 +734,7 @@ class selRangeClass {
 	}
 
 	copy () {		// для применения стилей, пока диапазон в процессе установления...
-		let cp  = new selRangeClass();
+		let cp  = new SelRangeClass();
 		cp.start.r = this.start.r;
 		cp.start.c = this.start.c;
 		cp.end.r   = this.end.r;
@@ -707,14 +747,27 @@ class selRangeClass {
 
 	toString () { return `[${this.sheet}]${itpCellClass.getColName(this.start.c-1)}${this.start.r}:${itpCellClass.getColName(this.end.c-1)}${this.end.r}`; }
 
-}// end of  selRangeClass
+}// end of  SelRangeClass
 
 
-class formulaClass {
+class FormulaClass {
 
 	constructor (selector='input.formula') {
-		this.input = document.querySelector(selector);		//  this.input = document.querySelector(selector) || 
-		
+		this.input     = document.querySelector(selector);		//  this.input = document.querySelector(selector) || 
+		this.inputCell = document.querySelector("#inputCell");
+		this.active    = false;
+		this.text      = "";
+		this.onEvents();	//	события на input
+
+	}// end of condtructor
+
+
+	checkActive () {	//	
+		this.text   = this.input.value;
+		this.active = ( this.text.search(/[=+-/\*(]$/ig) !== -1 )? true : false;
+	}
+
+	onEvents () {	
 		this.input.oninput = () => {
 			this.checkActive();
 			itpApp.aCell.td.innerHTML = this.text;
@@ -726,14 +779,15 @@ class formulaClass {
 		this.input.onkeyup = function (e) { 
 			if (e.keyCode === 13) {
 				itpApp.formula.active = false;
-				this.blur();
 				itpApp.aCell.td.classList.add("selected");
+				this.blur();
 			}
 		}
 		this.input.onfocus = () => {
 			if ( !itpApp.aCell ) console.log("this.input.onfocus()...  Нет активной ячейки!");
 			this.checkActive();
-			itpApp.aCell.td.innerHTML = this.text;
+			itpApp.aCell.setTD( this.text );
+		//	itpApp.aCell.td.innerHTML = this.text;
 		}
 		this.input.onblur  = () => { 
 			if ( itpApp.aCell && !this.active ) {
@@ -742,18 +796,10 @@ class formulaClass {
 				itpApp.aSh.addCell( itpApp.aCell.name, itpApp.aCell.text );
 				itpApp.aCell.td.innerHTML = itpApp.aCell.getValue();
 				itpApp.isNeedSave = true;
-	    	} else console.log("this.input.onblur()...   Нет активной ячейки!");
-	    //	this.active = false;
+			} else console.log("this.input.onblur()...   Нет активной ячейки!");
 		}
-		this.inputCell = document.querySelector("#inputCell");
-		this.active = false;
-		this.text   = "";
-	}// end of condtructor
 
-	checkActive () {
-		this.text   = this.input.value;
-		this.active = ( this.text.search(/[=+-/\*(]$/ig) !== -1 )? true : false;
-	}
+	}// end of   onEvents
 
 /*	setValue (options=null) {
 		(function () {
@@ -767,7 +813,7 @@ class formulaClass {
 	
 
 
-}// end of  formulaClass
+}// end of  FormulaClass
 
 
 
