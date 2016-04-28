@@ -33,6 +33,7 @@
 		</fieldset>
 		<button id="btnCreate" autofocus>Создать</button>
 		<button id="btnRestore" title="Восстановить из localStorage">Восстановить</button>
+		<button id="btnTest">Тест</button>
 
 
 		<fieldset>
@@ -57,17 +58,38 @@
 					<table class='itpTableCol'></table>
 				</div>
 			</div>
-			<div>
+			<div style="display:none;">
 				<div class="rowHeader">
 					<table class='itpTableRow'></table>
 				</div>
-				<div class="tableDiv">
-					<table class='itpTable'>
-					<div id="divForScroll"></div>
+				<div class="tableDiv111">
+					<table class='itpTable' style="display:none;">
 					<!--	<tbody></tbody>		-->
 					</table>
+					<!-- <div id="divScroll">
+						<table class='itpTable' id="tt"></table>
+					</div> -->
+
+					<!--<div id="divScroll">
+						<div id="divWrap">
+							<table class='itpTable' id="tt"></table>
+						</div>
+					</div> -->
+	
+
+				</div> 
+			</div>
+
+
+			<div class="tableDiv">
+				<div id="divScroll">
+					<div id="divWrap">
+						<table class='itpTable' id="tt"></table>
+					</div>
 				</div>
 			</div>
+				
+
 		</div>	
 
 	</main>

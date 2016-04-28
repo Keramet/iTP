@@ -150,6 +150,8 @@ div.rowHeader {
 }
 div.tableDiv {
 	overflow: scroll;
+	position: relative;
+	min-width: 702px;
 }
 
 div.empty, div.colHeader {
@@ -283,4 +285,24 @@ span.error {
 	color: red;
 	font-weight: bold;
 }
+
+#divScroll {
+	z-index: 1;
+/*	position: relative;*/
+/*	opacity: 0;
+
+	width: 2016px;
+	height: 916px;	
+ */
+}
+#tt {
+/*	position: absolute;*/
+	z-index: 0;
+}
+#divWrap {
+	position: fixed;
+	/*position: absolute;*/
+	overflow: hidden;
+}
+
 

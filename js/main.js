@@ -37,6 +37,7 @@ class itpClass {	//   Объект:  itpApp.
 
 		document.querySelector('#btnCreate' ).addEventListener("click", createClk);
 		document.querySelector('#btnRestore').addEventListener("click", restoreClk);
+		document.querySelector('#btnTest').addEventListener("click", testClk);
 		console.dir(itpApp);
 	
 		function createClk () {
@@ -81,6 +82,21 @@ class itpClass {	//   Объект:  itpApp.
 	
 			itpApp.createTabs();
 			itpApp.isInit = true;
+		}
+
+		function testClk () {
+			let tableDiv = document.querySelector(".tableDiv");
+			
+			// console.log(divScroll.scrollTop);
+			// console.log(divScroll.scrollY);
+			// console.log(divScroll.pageYOffset);
+			// console.log(divScroll.scrollHeight);
+		
+			tableDiv.scrollTop += 20;
+			// divScroll.scrollY += 20;
+			// divScroll.pageYOffset += 20;
+			// divScroll.scrollTop = divScroll.scrollHeight	
+			// console.log(divScroll.scrollTop);
 		}
 
 	}//	enf of  init()	
@@ -185,6 +201,7 @@ class itpClass {	//   Объект:  itpApp.
 			function _clearSheet () {			// используем, когда пересоздаём листы
 				let sheet = document.querySelector("div.sheet.active"),
 					tableGrid = sheet.querySelector('.itpTable');
+				//	divScroll = document.querySelector("#divScroll");
 
 				sheet.querySelector('.itpTableCol').innerHTML = "";
 				sheet.querySelector('.itpTableRow').innerHTML = "";
@@ -201,6 +218,8 @@ class itpClass {	//   Объект:  itpApp.
 			tableCol  = sheet.querySelector('.itpTableCol'),
 			tableRow  = sheet.querySelector('.itpTableRow'),
 			tableGrid = sheet.querySelector('.itpTable'),
+			divScroll = document.querySelector("#divScroll"),
+
 		//	tbodyGrid = tableGrid.querySelector('tbody'), 	
 			tbodyGrid = document.createElement("tbody");	// подумать, как лучше...
 		//	selMode = false, selRange = {}, getSel=null, anchor, focus; //, sr=null;	// для выделения диапазона ячеек
@@ -222,6 +241,16 @@ class itpClass {	//   Объект:  itpApp.
 				}
 			}	
 			sheet.querySelector('div.tableDiv').onscroll = _gridScroll;
+			window.onresize = function (e) {
+				let div = document.querySelector('div.tableDiv'),
+					divWrap = document.querySelector('#divWrap');
+				console.log( "ReSize!" );
+				console.log( div.clientWidth );
+			//	console.log( divWrap.style.width );
+			//	console.log( divWrap.width );
+				console.dir( divWrap );
+				console.log( divWrap.clientWidth );
+			}
 
 			tableCol.onclick = _clickTH; 
 			tableRow.onclick = _clickTH; 
@@ -233,12 +262,15 @@ class itpClass {	//   Объект:  itpApp.
 			console.time("_fillSheet(" + n + ")... ");
 			let row   = document.createElement("tr"),
 				cell  = document.createElement("td"),
-				itpSh = itpApp.data[n];
+				itpSh = itpApp.data[n],
+				tt =  document.querySelector("#tt");
 
 			if ( !itpSh ) return console.log(`Нет данных листа [${n}]`);
 
 			tableGrid.width  = itpSh.cCount * itpApp._conf.cellSize.w + itpApp._conf.scrollSize + "px";
 			tableGrid.height = itpSh.rCount * itpApp._conf.cellSize.h + itpApp._conf.scrollSize + "px";
+			divScroll.style.width  = itpSh.cCount * itpApp._conf.cellSize.w + itpApp._conf.scrollSize + "px";
+			divScroll.style.height = itpSh.rCount * itpApp._conf.cellSize.h + itpApp._conf.scrollSize + "px";
 			tableCol.width 	 = tableGrid.width;
 			tableRow.height  = tableGrid.height;
 		
@@ -273,6 +305,23 @@ class itpClass {	//   Объект:  itpApp.
 			}
 		*/
 
+			if (n === 0) {
+			//	console.log(cell.style.width);
+				row   = document.createElement("tr");
+
+				for (let c = 0; c < 7; c++) {
+					row.appendChild( cell.cloneNode(false) );
+				}
+				for (let r = 0; r < 11; r++) {
+					tt.appendChild( row.cloneNode(true) );
+				}
+				console.log(tt.style.width);
+				tt.onwheel = function (e) {
+					let tableDiv = document.querySelector(".tableDiv");
+					tableDiv.scrollTop += e.deltaY;
+
+				}
+			}
 
 			tableGrid.appendChild(tbodyGrid);	// если	tbody создаём динамически (tbodyGrid = document.createElement("tbody");)
 	
@@ -392,10 +441,34 @@ class itpClass {	//   Объект:  itpApp.
 
 		function _gridScroll () {
 			let needAddC = this.scrollWidth - (this.clientWidth + this.scrollLeft),
-				needAddR = this.scrollHeight - (this.clientHeight + this.scrollTop);
+				needAddR = this.scrollHeight - (this.clientHeight + this.scrollTop),
+				temp, tempC;
 
-			tableRow.style.top  = -this.scrollTop  + "px";
-			tableCol.style.left = -this.scrollLeft + "px";
+			console.log(`this.scrollHeight: ${this.scrollHeight}.`);
+			console.log(`this.clientHeight: ${this.clientHeight}.`);
+			console.log(`this.scrollTop: ${this.scrollTop}.`);
+
+			temp = Math.trunc( this.scrollTop / (itpApp._conf.cellSize.h/1) );
+			if (temp !== itpApp.temp) {
+				itpApp.temp = temp;
+				console.log(itpApp.temp);
+				fillRowsTh(temp);
+
+			}
+
+		//	tempC = itpCellClass.getColName( Math.trunc( this.scrollLeft / (itpApp._conf.cellSize.w/2) ) );
+			tempC = Math.trunc( this.scrollLeft / (itpApp._conf.cellSize.w/2) );
+			if (tempC !== itpApp.tempC) {
+				itpApp.tempC = tempC;
+				console.log(itpApp.tempC);
+				fillColsTh(tempC);
+			}
+
+
+			
+
+		//	tableRow.style.top  = -this.scrollTop  + "px";
+		//	tableCol.style.left = -this.scrollLeft + "px";
 
 			if (needAddC < itpApp._conf.cellSize.w)  __addCol();
 			if (needAddR < itpApp._conf.cellSize.h)  __addRow();
@@ -408,7 +481,7 @@ class itpClass {	//   Объект:  itpApp.
 					c;
 
 				tbodyGrid.insertRow(itpApp.aSh.rCount);
-				tableRow.insertRow(itpApp.aSh.rCount).insertCell(0).outerHTML = "<th>" + (itpApp.aSh.rCount + 1) + "</th>";
+			//	tableRow.insertRow(itpApp.aSh.rCount).insertCell(0).outerHTML = "<th>" + (itpApp.aSh.rCount + 1) + "</th>";
 
 				for (c = 0; c < itpApp.aSh.cCount; c++) {
 					tbodyGrid.rows[itpApp.aSh.rCount].insertCell(c);
@@ -416,20 +489,22 @@ class itpClass {	//   Объект:  itpApp.
 	
 				itpApp.aSh.rCount++;
 				tableGrid.height = itpApp.aSh.rCount * itpApp._conf.cellSize.h + itpApp._conf.scrollSize + "px";
-				tableRow.height = tableGrid.height;
+				divScroll.style.height = itpApp.aSh.rCount * itpApp._conf.cellSize.h + itpApp._conf.scrollSize + "px";
+			//	tableRow.height = tableGrid.height;
 			}
 
 			function __addCol() {
 				let sheet = document.querySelector("div.sheet.active"),
 					tableCol = sheet.querySelector('.itpTableCol'),				// надо ли заново объявлять ?
-					tableGrid = sheet.querySelector('.itpTable'),				//
+					tableGrid = sheet.querySelector('.itpTable'),
+					divScroll = document.querySelector("#divScroll"),			
 					tbodyGrid = tableGrid.getElementsByTagName('tbody')[0],		//
 					selTHRow = sheet.querySelector('.itpTableRow  th.selected'),
 					selIndex = selTHRow? selTHRow.parentNode.rowIndex : -1,
 					r, cell;
 
-				tableCol.rows[0].insertCell(itpApp.aSh.cCount).outerHTML = 
-					"<th>" + itpCellClass.getColName( itpApp.aSh.cCount ) + "</th>";
+			//	tableCol.rows[0].insertCell(itpApp.aSh.cCount).outerHTML = 
+			//		"<th>" + itpCellClass.getColName( itpApp.aSh.cCount ) + "</th>";
 
 				for (r = 0; r < itpApp.aSh.rCount; r++) {
 					cell = tbodyGrid.rows[r].insertCell(itpApp.aSh.cCount);
@@ -437,10 +512,26 @@ class itpClass {	//   Объект:  itpApp.
 				}
 
 				itpApp.aSh.cCount++;
-				tableGrid.width  = itpApp.aSh.cCount * itpApp._conf.cellSize.w + itpApp._conf.scrollSize + "px";
+				tableGrid.width = itpApp.aSh.cCount * itpApp._conf.cellSize.w + itpApp._conf.scrollSize + "px";
+				divScroll.style.width = itpApp.aSh.cCount * itpApp._conf.cellSize.w + itpApp._conf.scrollSize + "px";;
 			//	tableGrid.width = (tableGrid.scrollWidth + itp._config.cell.width) + "px";
-				tableCol.width = tableGrid.width;	
+			//	tableCol.width = tableGrid.width;	
 			}
+
+			function fillRowsTh (n=1) {
+				for (let i = 1, r = tableRow.rows.length; i < r; i++) {
+					tableRow.rows[i-1].cells[0].innerHTML = n + i;
+				}
+			}
+
+			function fillColsTh (n=1) {
+				for (let i = 1, c = tableCol.rows[0].cells.length; i < c; i++) {
+					tableCol.rows[0].cells[i-1].innerHTML = itpCellClass.getColName( n + i - 1);
+				}
+			}
+
+
+
 		}//	end of  _gridScroll()
 
 
