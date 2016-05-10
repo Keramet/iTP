@@ -15,25 +15,26 @@
 	<header>
 		<fieldset>
 			<legend>Таблица</legend>
-		
+			
 			<label><b>r</b>: <input type="number" id="rCount"  min="1" required title="Количество строк (r) на листе">
 			</label>
 			<label><b>c</b>: <input type="number" id=cCount min="1" required title="Количество столбцов (c) на листе">
 			</label>
 			<br>
-			<label><input type="number" id="shCount"  min="1" max="5" required title="Количество листов">
+			<label><b>Листы:</b> <input type="number" id="shCount"  min="1" max="5" required title="Количество листов">
 			</label>
-			<label title="Переключение листов"> :<b> Л. </b>: 
+			<button id="btnCreate" autofocus>Создать</button>
+			<!-- <label title="Переключение листов"> :<b> Л. </b>: 
 				<select name="sheetChange" >
 					<option value="reCreate">переСоздавать</option>	
 					<option value="hide">Прятать</option>	
 				</select>
-			 </label><br>
+			 </label><br> -->
 			
 		</fieldset>
-		<button id="btnCreate" autofocus>Создать</button>
+		
 		<button id="btnRestore" title="Восстановить из localStorage">Восстановить</button>
-		<button id="btnTest">Тест</button>
+		<!-- <button id="btnTest">Тест</button> -->
 
 
 		<fieldset>
@@ -58,11 +59,11 @@
 					<table class='itpTableCol'></table>
 				</div>
 			</div>
-			<div style="display:none;">
+			<div> <!-- style="display:none;" -->
 				<div class="rowHeader">
 					<table class='itpTableRow'></table>
 				</div>
-				<div class="tableDiv111">
+				<div class="tableDiv">
 					<table class='itpTable' style="display:none;">
 					<!--	<tbody></tbody>		-->
 					</table>
@@ -70,34 +71,32 @@
 						<table class='itpTable' id="tt"></table>
 					</div> -->
 
-					<!--<div id="divScroll">
+					<div id="divScroll">
 						<div id="divWrap">
 							<table class='itpTable' id="tt"></table>
 						</div>
-					</div> -->
+					</div> 
 	
 
 				</div> 
 			</div>
 
 
-			<div class="tableDiv">
+			<!-- <div class="tableDiv">
 				<div id="divScroll">
 					<div id="divWrap">
 						<table class='itpTable' id="tt"></table>
 					</div>
 				</div>
-			</div>
+			</div> -->
 				
 
 		</div>	
 
 	</main>
+			
 		
-		
-		
-	<footer>	
-	</footer>
+	<footer></footer>
 
 	<script src="js/main.js"></script>
 </body>
