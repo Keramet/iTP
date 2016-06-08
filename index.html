@@ -3,100 +3,72 @@
 <head>
 	<meta charset="utf8">
 	<title>iTP - Insart Table Procesor</title>
-	
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
-	<!-- <link rel='stylesheet' href='/css/bootstrap.min.css' type='text/css' media='all'>  -->
-	<!-- <link rel="stylesheet" href="css/bootstrap.css"  type="text/css"> -->
 	<link rel="stylesheet" href="css/style.css"  type="text/css">	
 </head>
 	
 <body>
-
-	<header>
-		<fieldset>
-			<legend>Таблица</legend>
-			
-			<label><b>r</b>: <input type="number" id="rCount"  min="1" required title="Количество строк (r) на листе">
-			</label>
-			<label><b>c</b>: <input type="number" id=cCount min="1" required title="Количество столбцов (c) на листе">
-			</label>
-			<br>
-			<label><b>Листы:</b> <input type="number" id="shCount"  min="1" max="5" required title="Количество листов">
-			</label>
-			<button id="btnCreate" autofocus>Создать</button>
-			<!-- <label title="Переключение листов"> :<b> Л. </b>: 
-				<select name="sheetChange" >
-					<option value="reCreate">переСоздавать</option>	
-					<option value="hide">Прятать</option>	
-				</select>
-			 </label><br> -->
-			
-		</fieldset>
-		
-		<button id="btnRestore" title="Восстановить из localStorage">Восстановить</button>
-		<!-- <button id="btnTest">Тест</button> -->
-
-
-		<fieldset>
-			<legend><i>Текущее состояние</i></legend>
-				<!-- <button id="btnClick">Клик ...</button><br>-->
-			<div id="outputCurrentState"></div>	
-		</fieldset>
-
-	</header>
 		
 	<main>
+		<header>
+			<fieldset>
+				<legend>Создать</legend>
+				<button
+					id="btnCreate"
+					autofocus
+					title="Создать новый проект">
+					ОК
+				</button>
+				<label>
+					<i>Листы:</i>
+					<input type="number" id="shCount"  min="1" max="20" required title="Количество листов">
+				</label>
+				<label>
+					<i>Строки</i>:
+					<input type="number" id="rCount"  min="1" required title="Количество строк на листе">
+				</label>
+				<label>
+					<i>Столбцы</i>:
+					<input type="number" id=cCount min="1" required title="Количество столбцов на листе">
+				</label>
+			</fieldset>
+
+			<fieldset>
+				<legend>Загрузить</legend>
+				<button
+					id="btnRestore"
+					title="Загрузить из localStorage">
+					LocalStorage 
+				</button>
+				<button
+					title="Загрузить c сервера">
+					Сервер
+				</button>
+			</fieldset>
+		</header>
+
 		<div class="formula">
-			<span class="formula">&fnof;<sub>x</sub></span><input class="formula"></input>
-			<span><i>Ячейка: </i></span><input class="formula cell" id="inputCell"></input>
+			<span class="formula">&fnof;<sub>x</sub></span>
+			<input class="formula"><!-- </input> -->
+			<div>
+				<span><i>Ячейка: </i></span>
+				<input class="formula cell" id="inputCell"><!-- </input> -->
+			</div>
 		</div>	
 		<div class="sheetsTab"></div>
 
 		<div class="sheet" id="sh-0">
-			<div>
-				<div class="empty"></div>
-				<div class="colHeader">
-					<table class='itpTableCol'></table>
-				</div>
-			</div>
-			<div> <!-- style="display:none;" -->
-				<div class="rowHeader">
-					<table class='itpTableRow'></table>
-				</div>
+			<div> 
 				<div class="tableDiv">
-					<table class='itpTable' style="display:none;">
-					<!--	<tbody></tbody>		-->
-					</table>
-					<!-- <div id="divScroll">
-						<table class='itpTable' id="tt"></table>
-					</div> -->
-
 					<div id="divScroll">
 						<div id="divWrap">
-							<table class='itpTable' id="tt"></table>
+							<table class='itpTable' id="tt" width="100%"></table>
 						</div>
 					</div> 
-	
-
 				</div> 
 			</div>
-
-
-			<!-- <div class="tableDiv">
-				<div id="divScroll">
-					<div id="divWrap">
-						<table class='itpTable' id="tt"></table>
-					</div>
-				</div>
-			</div> -->
-				
-
 		</div>	
 
 	</main>
-			
-		
-	<footer></footer>
 
 	<script src="js/main.js"></script>
 </body>

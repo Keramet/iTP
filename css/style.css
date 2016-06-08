@@ -2,15 +2,21 @@
 	padding: 5px;
 	margin: 0px;
 }
+html {
+	height: 98%;
+}
 body {
-	background: Lavender;		
+	background: Lavender;
+	min-height: 100%;
+	padding: 0px;
 }
 div {
 	border: 1px solid blue;	
 	padding: 0px;		
 }
 
-header {
+/*header {
+	padding: 5px;
 	border: 2px solid MidnightBlue;
 	border-radius: 4px;
 	padding: 7px;
@@ -23,20 +29,27 @@ header {
 	header>button{
 		margin-top: 20px;
 		display: inline-block;
-	}	
+	}	*/
 
 main {
-/*	display: none;	*/		
-	border: none;
+	position: absolute;
+    top: 0px; 
+    bottom: 0%;  /* 0px;  2%;   */    
+    left: 0px; 
+    right: 0px;
+    padding: 0px;
 }
 	main>div {
 		background: Lavender; /* PowderBlue;   #AAD4B9; */
 		border: none;
 	}	
-/*	main>div:nth-child(2) {	*/
 
 div.formula {
-	padding-top: 8px;
+	margin-top: 10px;
+	display: none;
+	/*vertical-align: middle;*/
+	/*min-height: 40px;
+	height: 50px;*/
 }
 div.formula span {
 	font-size: 20px;
@@ -60,7 +73,7 @@ div.formula input {
 	border-radius: 3px;
 	border: 1px solid blue;
 	background: #D8E6F3;
-	width: 60%;
+	width: 50%;
 	font-weight: bolder;
 	font-size: 16px;
 	font-family: "Courier New",Courier, monospace, "Comic Sans MS", Tahoma, Verdana;
@@ -70,13 +83,24 @@ div.formula input {
 	background: white;
 	color: blue;
 	}
-	input.formula.cell {
-		width: 20%;
+	div.formula div {
+		display: inline-block;
+		width: 30%;
+		border: 0px;
+		float: right;
+		white-space: nowrap;
 	}
-
+		div.formula div span{
+			width: 30%;
+			overflow: hidden;
+		}
+		input.formula.cell {
+			width: 120px;
+			display: inline-block;
+		}
 
 div.sheet {
-	margin: 0 10px 10px 10px;
+	/*margin: 0 0px 5px 0px;*/
 	border: none;
 	color: black;
 	display: none;
@@ -103,8 +127,9 @@ div.sheet>div:last-child {
 	background: Lavender;	/*	#AAD4B9;  #B1B1B9;    подобрать цвет!    */
 	border: none;
 	text-align: right;
-	padding: 5px 5px 0 5px;	
-	margin: 5px 10px 0 10px;
+	/*padding: 10px 10px 0 10px;	*/
+	padding-bottom: 0px;
+	/*margin: 5px 10px 0 10px;*/
 }
 	.sheetsTab a {
 		vertical-align: text-bottom;
@@ -112,12 +137,14 @@ div.sheet>div:last-child {
 	.sheetsTab a span {
 		display: inline-block;
 		border-radius: 10px 10px 0 0;
-		width: 80px;
+		width: 70px;
 		margin-right: 5px;
 		text-align: center;
 		color: #6E718C;
 		background: Silver;
 		padding: 5px;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 	.sheetsTab a span.active {
 		background: #7DB9CF;	
@@ -127,8 +154,8 @@ div.sheet>div:last-child {
 		color: white;
 	}
 	.sheetsTab a span.addSheet {
-		width: 50px;
-		margin-right: 60px;
+		/*width: 50px;*/
+		/*margin-right: 60px;*/
 		background: #B1F6D0;
 		border: 1px solid #0B4124;
 		border-bottom: none;
@@ -136,7 +163,7 @@ div.sheet>div:last-child {
 		color: #0B4124;
 	}
 
-div.empty {
+/*div.empty {
 	background: #AFCDE7;
 	text-align: center;
 }
@@ -147,29 +174,20 @@ div.colHeader {
 div.rowHeader {
 	overflow-x: scroll;
 	overflow-y: hidden;
-}
+}*/
 div.tableDiv {
 	overflow: scroll;
 	position: relative;
-	min-width: 702px;
+	border: 1px solid navy;
 }
 
-div.empty, div.colHeader {
+/*div.empty, div.colHeader {
 	height: 35px;
 	border-bottom: none;
-}
-div.empty, div.rowHeader {
-	float: left;
-	width: 70px;
-	border-right: none;
-}
-div.colHeader, div.tableDiv {
-	margin-left: 70px;
-	width: auto;	
-}
-div.rowHeader, div.tableDiv {
+}*/
+/*div.rowHeader, div.tableDiv {
 	height: 400px;
-}
+}*/
 
 /* .tableDiv table, .colHeader table, .rowHeader table {	*/
 main table {
@@ -180,37 +198,22 @@ main table {
 	position: relative;
 	padding: 0px;
 	background: white;
-	table-layout: fixed;		
+	table-layout: fixed;
+	/*width: 100%;	*/
 }
 div.tableDiv table {
 	color: navy;
-
 }
 
-th {
-	background: #AFCDE7;
-	border: 0px solid blue;
-	text-align: center;
-	font-weight: bold;
-	font-size: 14px;
-	color: blue;
-	text-shadow: 1px 1px 2px #6338E5, 0 0 1em white;
-	padding: 5px;
-	width: 88px;
-	/*width: 70px;*/
-/*	height: 18px;  */
-}
-	th.selected {
-		background: #96BAD9;
-		color: #181F8C;
-	}
 td {
-	width: 88px; 	
-	height: 21px;
+	/*width: 90px;*/
+	max-width: 90px;	
+	height: 20px;
+	padding: 5px;
 	background: #D8E6F3;
 	overflow: hidden;
-	white-space: nowrap;
-	padding: 5px;
+  	/*text-overflow: ellipsis;*/
+  	white-space: nowrap;
 }
 	td:hover, td.selected, td.hovered  {
 		cursor: text;
@@ -221,6 +224,8 @@ td {
 		color: #0B4124;
 	}
 	td.selected {
+		/*overflow: hidden;
+		white-space: nowrap;*/
 		background: #F4CFF7;
 		color: #28082B;
 	}
@@ -231,7 +236,36 @@ td {
 	td.input {
 		padding: 0px;
 		margin: 0px;
-		width: 98px;
+		/*width: 98px;*/
+	}
+	td:last-child {
+		/*background: green;*/
+		/*width: 40px;*/
+	}
+
+th, tr:first-child td {
+	background: #AFCDE7;
+	border: 0px solid blue;
+	text-align: center;
+	font-weight: bold;
+	font-size: 14px;
+	color: blue;
+	text-shadow: 1px 1px 2px #6338E5, 0 0 1em white;
+	padding: 5px;
+	width: 90px;
+	/*border: 1px solid navy;*/
+	/*width: 70px;*/
+	height: 20px;  
+}
+th, tr:first-child td:first-child {
+	border-right: 1px solid blue;
+}
+	th.selected, tr:first-child td.selected {
+		background: #96BAD9;
+		color: #181F8C;
+	}
+	tr:first-child td  {
+		border-bottom: 1px solid blue;
 	}
 
 input.inGrid {
@@ -246,31 +280,27 @@ fieldset {
 	display: inline-block;
 	text-align: center;
 	vertical-align: top;
-	float: left;
-	width: 30%;
-	min-width: 250px;
+	margin-right: 15px;
+	/*padding:s 5px;*/
+	/*float: left;*/
+	/*width: 30%;*/
+	/*min-width: 250px;*/
 }
-	fieldset:last-child {
+/*	fieldset:last-child {
 		float: right;
-	/*	text-align: right;
-			
-		border: 1px dotted gray;		*/
 		width: 30%;
-	/*	height: auto;
-		
-		overflow: auto;
-		overflow-y: scroll;
-	*/
 	}
 	#outputCurrentState {
 		text-align: left;
 		border:none;
-	}
-fieldset select {
-/*	width: 100px;	*/
+	}*/
+/*fieldset select {
+	width: 100px;	
+}*/
+
+button {
+	min-width: 70px;
 }
-
-
 input[type=number] {
 	width: 50px;
 };
@@ -293,8 +323,10 @@ span.error {
 /*	opacity: 0;
 
 	width: 2016px;
-	height: 916px;	
- */
+	height: 916px;
+*/	
+	border: 0px;	
+ 
 }
 #tt {
 /*	position: absolute;*/
@@ -304,6 +336,7 @@ span.error {
 	position: fixed;
 	/*position: absolute;*/
 	overflow: hidden;
+	border: 0px;
 }
 
 
