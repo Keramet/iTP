@@ -322,8 +322,10 @@ class itpClass {	//   Объект:  itpApp.
 
 			if ( !itpSh ) return console.log(`Нет данных листа [${n}]`);
 
-			divScroll.style.width  = (itpSh.cCount+1) * itpApp._conf.cellSize.w + itpApp._conf.scrollSize + "px";
-			divScroll.style.height = (itpSh.rCount+1) * itpApp._conf.cellSize.h + itpApp._conf.scrollSize + "px";
+			divScroll.style.width  = (itpSh.cCount+1) * (itpApp._conf.cellSize.w+2) + itpApp._conf.scrollSize + "px";
+			divScroll.style.height = (itpSh.rCount+1) * (itpApp._conf.cellSize.h+2) + itpApp._conf.scrollSize + "px";
+			console.log("divScroll.style.width: ", divScroll.style.width);
+			console.log("divScroll.style.height: ", divScroll.style.height);
 
 			countR = Math.trunc( tableDiv.clientHeight / (itpApp._conf.cellSize.h+3) );  // 2 - border; 16 - scroll
 			// console.log("countR: ", countR);		 
@@ -494,12 +496,12 @@ class itpClass {	//   Объект:  itpApp.
 
 			if (needAddC < itpApp._conf.cellSize.w) {
 				itpApp.aSh.cCount++;
-				divScroll.style.width = (itpApp.aSh.cCount+1) * itpApp._conf.cellSize.w + itpApp._conf.scrollSize + "px";
+				divScroll.style.width = (itpApp.aSh.cCount+1) * (itpApp._conf.cellSize.w+2) + itpApp._conf.scrollSize + "px";
 			} 
 			
 			if (needAddR < itpApp._conf.cellSize.h) {
 				itpApp.aSh.rCount++;
-				divScroll.style.height = (itpApp.aSh.rCount+1) * itpApp._conf.cellSize.h + itpApp._conf.scrollSize + "px";
+				divScroll.style.height = (itpApp.aSh.rCount+1) * (itpApp._conf.cellSize.h+2) + itpApp._conf.scrollSize + "px";
 			}
 
 			function fillRowsTh (n=1) {

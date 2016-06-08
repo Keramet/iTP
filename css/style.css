@@ -206,8 +206,8 @@ div.tableDiv table {
 }
 
 td {
-	/*width: 90px;*/
-	max-width: 90px;	
+	width: 90px;
+	/*max-width: 90px;	*/
 	height: 20px;
 	padding: 5px;
 	background: #D8E6F3;
