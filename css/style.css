@@ -3,7 +3,7 @@
 	margin: 0px;
 }
 html {
-	height: 98%;
+	height: 97%;
 }
 body {
 	background: Lavender;
@@ -85,16 +85,17 @@ div.formula input {
 	}
 	div.formula div {
 		display: inline-block;
-		width: 30%;
+		width: 25%;
 		border: 0px;
-		float: right;
+		/*float: right;*/
 		white-space: nowrap;
 	}
 		div.formula div span{
-			width: 30%;
+			width: 25%;
 			overflow: hidden;
 		}
 		input.formula.cell {
+			font-size: 15px;
 			width: 120px;
 			display: inline-block;
 		}
@@ -206,8 +207,8 @@ div.tableDiv table {
 }
 
 td {
-	width: 90px;
-	/*max-width: 90px;	*/
+	/*width: 90px;*/
+	max-width: 90px;	
 	height: 20px;
 	padding: 5px;
 	background: #D8E6F3;
@@ -237,6 +238,9 @@ td {
 		padding: 0px;
 		margin: 0px;
 		/*width: 98px;*/
+	}
+	td.formula {
+		background: #C7D9F5;
 	}
 	td:last-child {
 		/*background: green;*/
