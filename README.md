@@ -1,3 +1,4 @@
-iTP:
-Insart TABLE PROCESSOR (InsartTP)<br>
-Протестировать на сайте: http://keramet.kh.ua/itp/
+#### Онлайн табличный процессор
+##### Написан на чистом JavaScript (ES2015) без применения каких-либо сторонних библиотек
+
+####Протестировать можно тут: http://keramet.kh.ua/itp/

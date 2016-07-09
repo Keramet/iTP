@@ -63,24 +63,44 @@ class itpClass {	//   Объект:  itpApp.
 		function restoreClk () {
 			if (itpApp.isInit) return console.log(`restoreClk()...   itpApp.isInit: ${itpApp.isInit}.`);
 
-			itpApp.getData();
+			itpApp.getData()
+				.then( function () {
+					if ( itpApp.dataJSON ) {
+						itpApp.dataJSON.forEach( (sh, i) => {
+							let newSh = new itpSheetClass().fromJSON( sh );
+							itpApp.data.push( newSh );
+							if ( newSh["active"] )  itpApp.aSh = itpApp.data[ i ];
+						});
 
-			if ( itpApp.dataJSON ) {
-				itpApp.dataJSON.forEach( (sh, i) => {
-					let newSh = new itpSheetClass().fromJSON( sh );
-					itpApp.data.push( newSh );
-					if ( newSh["active"] )  itpApp.aSh = itpApp.data[ i ];
+						itpApp.sheetCount  = itpApp.data.length;
+						itpApp.nextSheetId = itpApp.data.length;
+
+						if ( !itpApp.aSh ) console.log("Нет активного листа!");
+
+						itpApp.createTabs();
+						itpApp.isInit = true;
+					} else {
+						console.info(`Данные не загружены! ... itpApp.dataLS: ${itpApp.dataLS};  itpApp.dataServ: ${itpApp.dataServ}.`);
+						// предложить создать проект "с нуля"
+					}
 				});
 
-				itpApp.sheetCount  = itpApp.data.length;
-				itpApp.nextSheetId = itpApp.data.length;
-				if ( !itpApp.aSh ) console.log("Нет активного листа!");
-			} else {
-				console.log(`Данные не загружены! ... itpApp.dataLS: ${itpApp.dataLS};  itpApp.dataServ: ${itpApp.dataServ}.`);
-			}
+			// if ( itpApp.dataJSON ) {
+			// 	itpApp.dataJSON.forEach( (sh, i) => {
+			// 		let newSh = new itpSheetClass().fromJSON( sh );
+			// 		itpApp.data.push( newSh );
+			// 		if ( newSh["active"] )  itpApp.aSh = itpApp.data[ i ];
+			// 	});
+
+			// 	itpApp.sheetCount  = itpApp.data.length;
+			// 	itpApp.nextSheetId = itpApp.data.length;
+			// 	if ( !itpApp.aSh ) console.log("Нет активного листа!");
+			// } else {
+			// 	console.log(`Данные не загружены! ... itpApp.dataLS: ${itpApp.dataLS};  itpApp.dataServ: ${itpApp.dataServ}.`);
+			// }
 	
-			itpApp.createTabs();
-			itpApp.isInit = true;
+			// itpApp.createTabs();
+			// itpApp.isInit = true;
 		}
 
 		function getRcountMin() {
@@ -636,32 +656,72 @@ class itpClass {	//   Объект:  itpApp.
 			console.log(`Запись в localStarge  ...  ${localStorage.itpAppData}`); 
 		}
 		itpApp.isNeedSave = false;
-	}
 
-	getData (fromLS=true, fromServer=true, callback) {
+
+		function saveJSONtoServer() {
+			return new Promise( function (resolve, reject) {
+				xhr = new XMLHttpRequest();
+
+				xhr.open( 'POST', url );
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.onload = () => {};
+  				xhr.onreadystatechange = () => { 
+  					if	(xhr.readyState === 4 && xhr.status === 200) console.log(`Запись на сервер...  ${xhr.statusText}`); 
+  				}
+
+				xhr.send( "itpAppData=" + encodeURIComponent(JSON.stringify( itpApp.data )) ); 
+			});
+		}
+	}// end of  saveData
+
+	getData (fromLS=true, fromServer=true) {
    		let xhr, url = "http://keramet.kh.ua/itpGetJSON.php";
 
-   		if (fromLS && localStorage.itpAppData) {
-   			itpApp.dataJSON = JSON.parse( localStorage.itpAppData );
-   			itpApp.dataLS 	= localStorage.itpAppData;
-			console.log(`Загрузка из localStorage!  ...  itpApp.dataLS: ${itpApp.dataLS}.`);
+   		if (fromLS) {
+			if (localStorage.itpAppData) {
+   				itpApp.dataJSON = JSON.parse( localStorage.itpAppData );
+   				itpApp.dataLS 	= localStorage.itpAppData;
+   				console.info(`Загружено из localStorage!  ...  itpApp.dataLS: ${itpApp.dataLS}.`);
+   				return Promise.resolve();
+   			} else {
+   				console.log("Нет данных в 'localStorage.itpAppData'");
+   			}
    		}
 
    		if (fromServer && !itpApp.dataJSON) {
-			xhr = new XMLHttpRequest();
-   			xhr.onreadystatechange = function () {
-        		if (xhr.readyState === 4 && xhr.status === 200) {
-                	itpApp.dataJSON = JSON.parse(xhr.responseText);
-                	itpApp.dataServ = xhr.responseText;
-                	console.log(`Загрузка с сервера...  ${xhr.statusText}`); 
-                	if (callback) callback();
-       			}
-			}
-			xhr.open('GET', url);
-			xhr.send(); 
-   		}
+   			return getJSONfromServer()
+   				.then( function (data) {
+   					itpApp.dataJSON = JSON.parse(data);
+               		itpApp.dataServ = data;
+               		console.info(`Загружено c сервера!  ...  itpApp.dataServ: ${itpApp.dataServ}.`);
+   				})
+   				.catch( function (err) {
+   					console.log(`Ошибка при загрузке с сервера...  [${err}]`);
+   				});
+   		} 	
+
    		// добавить проверку itpApp.dataLS и itpApp.dataServ, и предложить выбор
-	}
+
+   		function getJSONfromServer() {
+   			return new Promise(function (resolve, reject) {
+   				let xhr = new XMLHttpRequest();
+
+   				xhr.open('GET', url);
+   				xhr.onload = function () {
+   					if (xhr.status === 200) {
+   						resolve( xhr.responseText );
+   					} else {
+   						reject( `Server error: ${xhr.status}!` );
+   					}
+   				}
+   				xhr.onerror = function () {
+   					reject( Error("Сетевая ошибка при AJAX-запросе") );
+   				}
+				xhr.send();
+   			});
+   		}
+	}// end of  getData
+
 
 	checkCell (cell) {		// 		попадает ли ячейка в таблицу и возвращает координаты в таблице
 		if ( !cell || cell.sheetId !== itpApp.aSh.id ) return false;

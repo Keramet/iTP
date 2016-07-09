@@ -89,13 +89,6 @@ class itpCellClass {
 			return this.value = "";
 		}
 
-		// 	if (this.text === "" || this.text === "=") {
-		// 	this.text  = "";
-		// 	this.value = "";
-		// 	return 0;
-		// }
-
-
 		if (this.text[0] === "=") {
 			formula = this.text.substring(1);
 			try   {
